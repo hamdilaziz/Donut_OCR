@@ -8,7 +8,7 @@
 #SBATCH --hint=nomultithread         # we get physical cores not logical
 #SBATCH --distribution=block:block   # we pin the tasks on contiguous cores
 #SBATCH --time=01:00:00              # maximum execution time (HH:MM:SS)
-#SBATCH --output=mh_chatbot_output.out
+#SBATCH --output=donut_ocr.out
 #SBATCH --error=errors.out     
 #SBATCH -A jqv@v100
 #SBATCH -C v100                
