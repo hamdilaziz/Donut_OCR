@@ -86,10 +86,10 @@ class IAM_dataset(Dataset):
         y = torch.vstack(y)
         return x,y
 
-train_dataset = IAM_dataset(train_names, 'train_set', device=config['device'])
+train_dataset = IAM_dataset(train_names, 'train', device=config['device'])
 train_indices = DataLoader(range(len(train_dataset)), batch_size=config['batch_size'], shuffle=True)
 
-valid_dataset = IAM_dataset(valid_names, 'valid_set', device=config['device'])
+valid_dataset = IAM_dataset(valid_names, 'valid', device=config['device'])
 valid_indices = DataLoader(range(len(valid_dataset)), batch_size=config['batch_size'], shuffle=True)
 
 # Load the model 
