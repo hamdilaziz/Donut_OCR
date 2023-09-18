@@ -17,7 +17,7 @@ json_name = "formatted-IAM-DB-subwords-bart.json"
 imgs_folder = "flat-300dpi"
 
 # load the data
-content = json.read(os.path.join(data_folder_path, sub_folder_name, json_name))
+content = json.load(os.path.join(data_folder_path, sub_folder_name, json_name))
 charset = content['charset']
 ground_truth = content['ground_truth']
 train_set, valid_set, test_set = ground_truth['train'], ground_truth['valid'], ground_truth['test']
