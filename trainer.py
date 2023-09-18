@@ -76,11 +76,10 @@ class IAM_dataset(Dataset):
                                              self.data_set,
                                              'images',
                                              name+self.ext), map_location=self.device))
-
-          y.append(torch.load(os.path.join(self.data_folder_path,
-                                           self.data_set,
-                                           'gt',
-                                           name+self.ext), map_location=self.device))
+            y.append(torch.load(os.path.join(self.data_folder_path,
+                                             self.data_set,
+                                             'gt',
+                                             name+self.ext), map_location=self.device))
                 
         x = torch.vstack(x)
         y = torch.vstack(y)
