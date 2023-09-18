@@ -128,7 +128,7 @@ for epoch in tqdm(range(config['epochs'])):
     if step % 10 == 0:
         model.eval()
         with torch.no_grad():
-          batch = next(iter(valid_indices)):
+          batch = next(iter(valid_indices))
           x_valid,y_valid = valid_dataset[batch]
           output = model(**{'pixel_values':x_valid, 'labels':y_valid})
           valid_loss = output.loss.mean().item()
