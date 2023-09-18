@@ -92,8 +92,6 @@ valid_dataset = IAM_dataset(valid_names, 'valid_set', device=config['device'])
 valid_indices = DataLoader(range(len(valid_dataset)), batch_size=config['batch_size'], shuffle=True)
 
 # Load the model 
-from transformers import DonutProcessor, VisionEncoderDecoderModel
-
 model = VisionEncoderDecoderModel.from_pretrained("/gpfsstore/rech/jqv/ubb84id/huggingface_models/donut/model")
 
 # Adjust our image size and output sequence lengths
