@@ -76,5 +76,5 @@ for names,dt_set,out_set in zip([train_names, valid_names, test_names], [train_s
         return_tensors = 'pt',
     )
     # save
-    torch.save(inputs['pixel_values'], os.path.join(data_folder_path, '1280_960/images', out_set, name.split('.')[0]+ex))
-    torch.save(inputs['labels'], os.path.join(data_folder_path, '1280_960/gt', out_set, name.split('.')[0]+ex))
+    torch.save(inputs['pixel_values'], os.path.join(data_folder_path, '1280_960/images', out_set, name.split('.')[0]+ext))
+    torch.save(inputs['labels'], os.path.join(data_folder_path, '1280_960/gt', out_set, name.split('.')[0]+ext))
