@@ -4,7 +4,7 @@ import os
 import random
 
 import torch 
-from transformers import VisionEncoderDecoderModel
+from transformers import VisionEncoderDecoderModel, DonutProcessor
 import wandb
 from tqdm.notebook import tqdm
 from torch.utils.data import Dataset, DataLoader
@@ -93,7 +93,17 @@ valid_dataset = IAM_dataset(valid_names, 'valid_set', device=config['device'])
 valid_indices = DataLoader(range(len(valid_dataset)), batch_size=config['batch_size'], shuffle=True)
 
 # Load the model 
+processor = DonutProcessor.from_pretrained("/gpfsstore/rech/jqv/ubb84id/huggingface_models/donut/processor")
 model = VisionEncoderDecoderModel.from_pretrained("/gpfsstore/rech/jqv/ubb84id/huggingface_models/donut/model")
+
+tokenizer = processor.tokenizer
+processor.image_processor.size = image_size
+processor.image_processor.mean = mean
+processor.image_processor.std = std
+processor.image_processor.do_align_long_axis = False
+processor.image_processor.do_resize = False
+tokenizer = processor.tokenizer
+
 
 # Adjust our image size and output sequence lengths
 model.config.encoder.image_size = config['image_size'][::-1] # (height, width)
