@@ -130,25 +130,26 @@ step = 0
 best_valid_loss = float('inf')
 for epoch in tqdm(range(config['epochs'])):
     for batch in tqdm(train_indices):
+        # training
         x_train,y_train = train_dataset[batch]
         output = model(**{'pixel_values':x_train, 'labels':y_train})
         train_loss = output.loss
         train_loss.backward()
         opt.step()
-      
-    if step % 10 == 0:
-        model.eval()
-        with torch.no_grad():
-          batch = next(iter(valid_indices))
-          x_valid,y_valid = valid_dataset[batch]
-          output = model(**{'pixel_values':x_valid, 'labels':y_valid})
-          valid_loss = output.loss.mean().item()
-          wandb.log({"train_loss":train_loss.mean().item(), "valid_loss":valid_loss})
-          print("Train loss {}, valid loss {}".format(train_loss.mean().item(), valid_loss))
-        if best_valid_loss < valid_loss:
-          best_valid_loss = valid_loss
-          model.save_pretrained("/gpfsstore/rech/jqv/ubb84id/hugginface_models/donut_iam_checkpoints_1280_960_1")
-          
-        model.train()
-    step += 1
+        # log & eval
+        if step % 10 == 0:
+            model.eval()
+            with torch.no_grad():
+              batch = next(iter(valid_indices))
+              x_valid,y_valid = valid_dataset[batch]
+              output = model(**{'pixel_values':x_valid, 'labels':y_valid})
+              valid_loss = output.loss.mean().item()
+              wandb.log({"train_loss":train_loss.mean().item(), "valid_loss":valid_loss})
+              print("Train loss {}, valid loss {}".format(train_loss.mean().item(), valid_loss))
+            if best_valid_loss < valid_loss:
+              best_valid_loss = valid_loss
+              model.save_pretrained("/gpfsstore/rech/jqv/ubb84id/hugginface_models/donut_iam_checkpoints_1280_960_1")
+            model.train()
+        step += 1
+    
 run.finish()
