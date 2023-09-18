@@ -37,14 +37,9 @@ config = {
 # load donut processor
 processor = DonutProcessor.from_pretrained("/gpfsstore/rech/jqv/ubb84id/huggingface_models/donut/processor")
 
-mean = config['mean']
-std = config['std']
-image_size = config['image_size']
-max_length = config['max_length'] # the maximum length found on the data 178
-
-processor.image_processor.size = image_size
-processor.image_processor.mean = mean
-processor.image_processor.std = std
+processor.image_processor.size = config['image_size']
+processor.image_processor.mean = config['mean']
+processor.image_processor.std = config['std']
 processor.image_processor.do_align_long_axis = False
 processor.image_processor.do_resize = False
 tokenizer = processor.tokenizer
