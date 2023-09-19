@@ -45,10 +45,10 @@ config = {
   "std":[0.229, 0.224, 0.225],
   "image_size":[960, 1280],
   "max_length":224,
-  "batch_size":6,
+  "batch_size":8,
   "learning_rate":1e-6,
   "device":'cuda' if torch.cuda.is_available() else 'cpu',
-  "epochs":20
+  "epochs":26
 }
 
 # dataset
@@ -148,7 +148,7 @@ for epoch in tqdm(range(config['epochs'])):
               print("Train loss {}, valid loss {}".format(train_loss.mean().item(), valid_loss))
             if best_valid_loss < valid_loss:
               best_valid_loss = valid_loss
-              model.save_pretrained("/gpfsstore/rech/jqv/ubb84id/hugginface_models/donut_iam_checkpoints_1280_960_1")
+              model.save_pretrained("/gpfsstore/rech/jqv/ubb84id/output_models/donut_iam_checkpoints_1280_960_1_{}".format(best_valid_loss))
             model.train()
         step += 1
     
