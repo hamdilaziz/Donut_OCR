@@ -153,8 +153,6 @@ for epoch in tqdm(range(config['epochs'])):
                     f.write("checkpoints created at step: {} with train loss : {} and valid loss : {}".format(step, train_loss, best_valid_loss))
                 print("checkpoints created at step: {} with train loss : {} and valid loss : {}".format(step, train_loss, best_valid_loss))
             model.train()
-        if step + 1 >= 150:
-            opt.param_groups[0]['lr'] = opt.param_groups[0]['lr'] * 1e-1/2
         step += 1
 
 
