@@ -155,7 +155,7 @@ for epoch in tqdm(range(config['epochs'])):
                 best_valid_loss = valid_loss
                 output_folder_name = "donut_encoder_only_lr{}_h{}_w{}".format(config['learning_rate'], config['image_size'][1], config['image_size'][0])
                 model.save_pretrained("/gpfsstore/rech/jqv/ubb84id/output_models/"+output_folder_name)
-                with open("/gpfsstore/rech/jqv/ubb84id/output_models/"+output_folder_name+"/info.text", "w") as f:
+                with open("/gpfsstore/rech/jqv/ubb84id/output_models/"+output_folder_name+"/info.txt", "w") as f:
                     f.write("checkpoints created at step: {} with train loss : {} and valid loss : {}".format(step, train_loss, best_valid_loss))
                 print("checkpoints created at step: {} with train loss : {} and valid loss : {}".format(step, train_loss, best_valid_loss))
             model.train()
