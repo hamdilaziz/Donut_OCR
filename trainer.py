@@ -147,8 +147,10 @@ for epoch in tqdm(range(config['epochs'])):
               wandb.log({"train_loss":train_loss.mean().item(), "valid_loss":valid_loss})
               print("Train loss {}, valid loss {}".format(train_loss.mean().item(), valid_loss))
             if best_valid_loss < valid_loss:
-              best_valid_loss = valid_loss
-              model.save_pretrained("/gpfsstore/rech/jqv/ubb84id/output_models/donut_iam_checkpoints_1280_960_1_{}".format(best_valid_loss))
+                best_valid_loss = valid_loss
+                with open("/gpfsstore/rech/jqv/ubb84id/output_models/donut_iam/info.text", "w") as f:
+                    f.write("checkpoints created at step: {} with train loss : {} and valid loss : {}".format(step, train_loss, best_valid_loss))
+                model.save_pretrained("/gpfsstore/rech/jqv/ubb84id/output_models/donut_iam")
             model.train()
         step += 1
     
