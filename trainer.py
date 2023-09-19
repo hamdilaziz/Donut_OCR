@@ -45,10 +45,10 @@ config = {
   "std":[0.229, 0.224, 0.225],
   "image_size":[960, 1280],
   "max_length":224,
-  "batch_size":8,
+  "batch_size":10,
   "learning_rate":1e-6,
   "device":'cuda' if torch.cuda.is_available() else 'cpu',
-  "epochs":26
+  "epochs":30
 }
 
 # dataset
@@ -148,10 +148,21 @@ for epoch in tqdm(range(config['epochs'])):
               print("Train loss {}, valid loss {}".format(train_loss.mean().item(), valid_loss))
             if best_valid_loss < valid_loss:
                 best_valid_loss = valid_loss
-                with open("/gpfsstore/rech/jqv/ubb84id/output_models/donut_iam/info.text", "w") as f:
-                    f.write("checkpoints created at step: {} with train loss : {} and valid loss : {}".format(step, train_loss, best_valid_loss))
-                model.save_pretrained("/gpfsstore/rech/jqv/ubb84id/output_models/donut_iam")
+                # with open("/gpfsstore/rech/jqv/ubb84id/output_models/donut_iam/info.text", "w") as f:
+                #     f.write("checkpoints created at step: {} with train loss : {} and valid loss : {}".format(step, train_loss, best_valid_loss))
+                # model.save_pretrained("/gpfsstore/rech/jqv/ubb84id/output_models/donut_iam")
             model.train()
+        if step + 1 >= 150:
+            opt.param_groups[0]['lr'] = opt.param_groups[0]['lr'] * 1e-1/2
         step += 1
-    
+
+# save model weights on wandb
+import tempfile
+with tempfile.TemporaryDirectory() as tempdir:
+    model.save_pretrained(tempdir)
+    listfiles = os.listdir(tempdir)
+    artifact = wandb.Artifact('model', type='model')
+    for filename in listfiles:
+        artifact.add_file(os.path.join(tempdir,filename))
+    run.log_artifact(artifact)
 run.finish()
