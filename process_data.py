@@ -30,7 +30,7 @@ test_names = list(test_set.keys())
 config = {
     "mean":[0.485, 0.456, 0.406],
     "std":[0.229, 0.224, 0.225],
-    "image_size":[960, 1280],
+    "image_size":[1920, 2560],
     "max_length":224
 }
 
@@ -47,12 +47,13 @@ tokenizer = processor.tokenizer
 
 # create output paths
 ext = '.pt'
-if os.path.exists(os.path.join(data_folder_path, '1280_960')) == False:
-  os.mkdir(os.path.join(data_folder_path, '1280_960'))
+data_folder_name = "{}_{}".format(config['image_size'][1], config['image_size'][0])
+if os.path.exists(os.path.join(data_folder_path, data_folder_name)) == False:
+  os.mkdir(os.path.join(data_folder_path, data_folder_name))
   for d in ['train', 'valid','test']:
-    os.mkdir(os.path.join(data_folder_path, '1280_960',d))
+    os.mkdir(os.path.join(data_folder_path, data_folder_name,d))
     for m in ['images','gt']:
-      os.mkdir(os.path.join(data_folder_path, '1280_960',d,m))
+      os.mkdir(os.path.join(data_folder_path, data_folder_name,d,m))
 
 # processing     
 for names,dt_set,out_set in zip([train_names, valid_names, test_names], [train_set, valid_set, test_set], ['train','valid','test']):
@@ -71,5 +72,5 @@ for names,dt_set,out_set in zip([train_names, valid_names, test_names], [train_s
         return_tensors = 'pt',
     )
     # save
-    torch.save(inputs['pixel_values'], os.path.join(data_folder_path, '1280_960', out_set,'images', name.split('.')[0]+ext))
-    torch.save(inputs['labels'], os.path.join(data_folder_path, '1280_960', out_set,'gt', name.split('.')[0]+ext))
+    torch.save(inputs['pixel_values'], os.path.join(data_folder_path, data_folder_name, out_set,'images', name.split('.')[0]+ext))
+    torch.save(inputs['labels'], os.path.join(data_folder_path, data_folder_name, out_set,'gt', name.split('.')[0]+ext))
