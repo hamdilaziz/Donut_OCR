@@ -13,7 +13,32 @@ import json
 import re
 import editdistance
 
+#####################" cer thomas
+def keep_all_but_tokens(str, tokens):
+    """
+    Remove all layout tokens from string
+    """
+    return re.sub('([' + tokens + '])', '', str)
 
+def format_string_for_cer(str, layout_tokens):
+    """
+    Format string for CER computation: remove layout tokens and extra spaces
+    """
+    if layout_tokens is not None:
+        str = keep_all_but_tokens(str, layout_tokens)  # remove layout tokens from metric
+    str = re.sub('([\n])+', "\n", str)  # remove consecutive line breaks
+    str = re.sub('([ ])+', " ", str).strip()  # remove consecutive spaces
+    return str
+
+def edit_cer_from_string(gt, pred, layout_tokens=None):
+    """
+    Format and compute edit distance between two strings at character level
+    """
+    gt = format_string_for_cer(gt, layout_tokens)
+    pred = format_string_for_cer(pred, layout_tokens)
+    return editdistance.eval(gt, pred)
+
+####################################
 data_root = "/gpfsstore/rech/jqv/ubb84id/data/IAM"
 sub_folder_name = "IAM_page_sem"
 json_name = "formatted-IAM-DB-subwords-bart.json"
@@ -77,43 +102,43 @@ class IAM_dataset(Dataset):
         y = torch.vstack(y)
         return x,y
 
-train_dataset = IAM_dataset(train_names, 'train', device=config['device'])
-train_indices = DataLoader(range(len(train_dataset)), batch_size=config['batch_size'], shuffle=True)
 
-valid_dataset = IAM_dataset(valid_names, 'valid', device=config['device'])
-valid_indices = DataLoader(range(len(valid_dataset)), batch_size=config['batch_size'], shuffle=True)
+test_dataset = IAM_dataset(test_names, 'test', device=config['device'])
+test_indices = DataLoader(range(len(test_dataset)), batch_size=config['batch_size'], shuffle=True)
 
 # Load the processor 
 processor = DonutProcessor.from_pretrained("/gpfsstore/rech/jqv/ubb84id/huggingface_models/donut/processor")
-# model = VisionEncoderDecoderModel.from_pretrained("/gpfsstore/rech/jqv/ubb84id/huggingface_models/donut/model")
 
 
+# evaluation
+sepcial_tokens = tokenizer.special_tokens_map.values()
+cer = {}
+f = open('result.txt', mode='w')
+for model_name in config['model_names']:
+    cer[model_name] = []
+    model = VisionEncoderDecoderModel.from_pretrained(os.path.join(config["path"], model_name))
+    cer_list = []
+    model.eval()
+    model.to(config['device'])
+    with torch.no_grad():
+        for batch in tqdm(test_indices):
+            x_test,y_test = test_dataset[batch]
+            output = model(**{'pixel_values':x_test, 'labels':y_test})
+            test_loss = output.loss.mean().item()
+            logits = output.logits
+            preds = logits.argmax(-1).detach().cpu()
+    
+            for sample in range(config['batch_size']):
+                img = np.moveaxis(x_test[i].detach().cpu().numpy(), 0,2)
+                tokens = tokenizer.convert_ids_to_tokens(y_test[i].detach().cpu())
+                text = tokenizer.convert_tokens_to_string([t for t in tokens if t not in sepcial_tokens])
+                
+                pred_tokens = tokenizer.convert_ids_to_tokens(preds[i])
+                pred_text = tokenizer.convert_tokens_to_string([t for t in pred_tokens if t not in sepcial_tokens])
+                cer[model_name].append(edit_cer_from_string(text, pred_text)/len(text))
+                
+            f.write("Model : {}, CER : {}\n".format(model_name, mean(cer[model_name]))
+                                                      
 
-def keep_all_but_tokens(str, tokens):
-    """
-    Remove all layout tokens from string
-    """
-    return re.sub('([' + tokens + '])', '', str)
-
-def format_string_for_cer(str, layout_tokens):
-    """
-    Format string for CER computation: remove layout tokens and extra spaces
-    """
-    if layout_tokens is not None:
-        str = keep_all_but_tokens(str, layout_tokens)  # remove layout tokens from metric
-    str = re.sub('([\n])+', "\n", str)  # remove consecutive line breaks
-    str = re.sub('([ ])+', " ", str).strip()  # remove consecutive spaces
-    return str
-
-def edit_cer_from_string(gt, pred, layout_tokens=None):
-    """
-    Format and compute edit distance between two strings at character level
-    """
-    gt = format_string_for_cer(gt, layout_tokens)
-    pred = format_string_for_cer(pred, layout_tokens)
-    return editdistance.eval(gt, pred)
-
-# Exemple d'utilisation
-# non_character_tokens = ["ⓟ","Ⓟ"]
-# metrics["edit_chars"] = [edit_cer_from_string(u, v, non_character_tokens) for u, v in zip(values["str_y"], values["str_x"])]
-# metrics["nb_chars"] = [nb_chars_cer_from_string(gt, non_character_tokens) for gt in values["str_y"]]
+    
+f.close()
