@@ -137,7 +137,7 @@ for model_name in config['model_names']:
                 pred_text = tokenizer.convert_tokens_to_string([t for t in pred_tokens if t not in sepcial_tokens])
                 cer[model_name].append(edit_cer_from_string(text, pred_text)/len(text))
                 
-            f.write("Model : {}, CER : {}\n".format(model_name, mean(cer[model_name]))
+            f.write("Model : {}, CER : {}\n".format(model_name, mean(cer[model_name])))
                                                       
 
     
