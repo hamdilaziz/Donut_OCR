@@ -108,7 +108,7 @@ test_indices = DataLoader(range(len(test_dataset)), batch_size=config['batch_siz
 
 # Load the processor 
 processor = DonutProcessor.from_pretrained("/gpfsstore/rech/jqv/ubb84id/huggingface_models/donut/processor")
-
+tokenizer = processor.tokenizer
 
 # evaluation
 sepcial_tokens = tokenizer.special_tokens_map.values()
@@ -128,8 +128,8 @@ for model_name in config['model_names']:
             logits = output.logits
             preds = logits.argmax(-1).detach().cpu()
     
-            for sample in range(config['batch_size']):
-                img = np.moveaxis(x_test[i].detach().cpu().numpy(), 0,2)
+            for i in range(config['batch_size']):
+                # img = np.moveaxis(x_test[i].detach().cpu().numpy(), 0,2)
                 tokens = tokenizer.convert_ids_to_tokens(y_test[i].detach().cpu())
                 text = tokenizer.convert_tokens_to_string([t for t in tokens if t not in sepcial_tokens])
                 
