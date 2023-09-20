@@ -63,7 +63,7 @@ config = {
   "std":[0.229, 0.224, 0.225],
   "image_size":[960, 1280],
   "max_length":224,
-  "batch_size":10,
+  "batch_size":1,
   "device":'cuda' if torch.cuda.is_available() else 'cpu',
 }
 
@@ -115,7 +115,6 @@ sepcial_tokens = tokenizer.special_tokens_map.values()
 cer = {}
 f = open('result.txt', mode='w')
 for model_name in config['model_names']:
-    cer[model_name] = []
     model = VisionEncoderDecoderModel.from_pretrained(os.path.join(config["path"], model_name))
     cer_list = []
     model.eval()
@@ -124,20 +123,21 @@ for model_name in config['model_names']:
         for batch in tqdm(test_indices):
             x_test,y_test = test_dataset[batch]
             output = model(**{'pixel_values':x_test, 'labels':y_test})
-            test_loss = output.loss.mean().item()
+            # test_loss = output.loss.mean().item()
             logits = output.logits
             preds = logits.argmax(-1).detach().cpu()
     
-            for i in range(config['batch_size']):
-                # img = np.moveaxis(x_test[i].detach().cpu().numpy(), 0,2)
-                tokens = tokenizer.convert_ids_to_tokens(y_test[i].detach().cpu())
-                text = tokenizer.convert_tokens_to_string([t for t in tokens if t not in sepcial_tokens])
+            # for i in range(config['batch_size']):
+            # img = np.moveaxis(x_test[i].detach().cpu().numpy(), 0,2)
+            i = 0
+            tokens = tokenizer.convert_ids_to_tokens(y_test[i].detach().cpu())
+            text = tokenizer.convert_tokens_to_string([t for t in tokens if t not in sepcial_tokens])
+            
+            pred_tokens = tokenizer.convert_ids_to_tokens(preds[i])
+            pred_text = tokenizer.convert_tokens_to_string([t for t in pred_tokens if t not in sepcial_tokens])
+            cer_list.append(edit_cer_from_string(text, pred_text)/len(text))
                 
-                pred_tokens = tokenizer.convert_ids_to_tokens(preds[i])
-                pred_text = tokenizer.convert_tokens_to_string([t for t in pred_tokens if t not in sepcial_tokens])
-                cer[model_name].append(edit_cer_from_string(text, pred_text)/len(text))
-                
-            f.write("Model : {}, CER : {}\n".format(model_name, mean(cer[model_name])))
+    f.write("Model : {}, CER : {}\n".format(model_name, np.mean(cer_list)))
                                                       
 
     
