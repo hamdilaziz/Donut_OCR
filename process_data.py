@@ -61,7 +61,7 @@ for names,dt_set,out_set in zip([train_names, valid_names, test_names], [train_s
     gt = dt_set[name]['pages'][0]["text"][1:-1]
     img = plt.imread(os.path.join(data_folder_path, sub_folder_name, imgs_folder, name))
     img = cv.cvtColor(img, cv.COLOR_GRAY2RGB)
-    img = cv.resize(img, tuple(image_size), cv.INTER_AREA)
+    img = cv.resize(img, tuple(config['image_size']), cv.INTER_AREA)
     inputs = processor(
         img,
         text = gt,
