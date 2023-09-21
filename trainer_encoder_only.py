@@ -13,7 +13,7 @@ import logging
 from torch.optim import AdamW
 import json
 
-
+from metrics import edit_cer_from_string, edit_wer_from_string
 
 logger = logging.getLogger(__name__)
 def set_seed(seed):
@@ -44,9 +44,9 @@ config = {
   "part":"encoder_only",
   "mean":[0.485, 0.456, 0.406],
   "std":[0.229, 0.224, 0.225],
-  "image_size":[960, 1280],
+  "image_size":[1920, 2560],
   "max_length":224,
-  "batch_size":10,
+  "batch_size":4,
   "learning_rate":1e-6,
   "device":'cuda' if torch.cuda.is_available() else 'cpu',
   "epochs":30
@@ -57,7 +57,7 @@ class IAM_dataset(Dataset):
     def __init__(self, 
                  paths,
                  data_set, 
-                 data_folder_path = "/gpfsstore/rech/jqv/ubb84id/data/IAM/1280_960",
+                 data_folder_path = "/gpfsstore/rech/jqv/ubb84id/data/IAM/2560_1920",
                  device='cpu',
                  ext='.pt'):
         
@@ -103,7 +103,7 @@ processor.image_processor.std = config['std']
 processor.image_processor.do_align_long_axis = False
 processor.image_processor.do_resize = False
 tokenizer = processor.tokenizer
-
+sepcial_tokens = tokenizer.special_tokens_map.values()
 
 # Adjust our image size and output sequence lengths
 model.config.encoder.image_size = config['image_size'][::-1] # (height, width)
@@ -142,15 +142,25 @@ for epoch in tqdm(range(config['epochs'])):
         train_loss.backward()
         opt.step()
         # log & eval
-        if step % 10 == 0:
+        if step % 8 == 0:
             model.eval()
             with torch.no_grad():
-              batch = next(iter(valid_indices))
-              x_valid,y_valid = valid_dataset[batch]
-              output = model(**{'pixel_values':x_valid, 'labels':y_valid})
-              valid_loss = output.loss.mean().item()
-              wandb.log({"train_loss":train_loss.mean().item(), "valid_loss":valid_loss})
-              print("Train loss {}, valid loss {}".format(train_loss.mean().item(), valid_loss))
+                batch = next(iter(valid_indices))
+                x_valid,y_valid = valid_dataset[batch]
+                output = model(**{'pixel_values':x_valid, 'labels':y_valid})
+                valid_loss = output.loss.mean().item()
+                # get pred text
+                preds = output.logits.argmax(-1)[0].detach().cpu()
+                tokens = tokenizer.convert_ids_to_tokens(preds)
+                pred_text = tokenizer.convert_tokens_to_string([t for t in tokens if t not in sepcial_tokens])
+                # gt text
+                y_valid = y_valid[0].detach().cpu()
+                tokens = tokenizer.convert_ids_to_tokens(y_valid)
+                text = tokenizer.convert_tokens_to_string([t for t in tokens if t not in sepcial_tokens])
+                cer = edit_cer_from_string(text, pred_text)/len(text)
+                wer = edit_wer_from_string(text, pred_text)/len(text)
+                run.log({"train_loss":train_loss.mean().item(), "valid_loss":valid_loss, "cer":cer, "wer":wer})
+                print("img size {}, Train loss {}, valid loss {}, cer {}, wer {}".format(x_valid.shape, train_loss.mean().item(), valid_loss, cer, wer))
             if valid_loss < best_valid_loss:
                 best_valid_loss = valid_loss
                 output_folder_name = "donut_encoder_only_lr{}_h{}_w{}".format(config['learning_rate'], config['image_size'][1], config['image_size'][0])
