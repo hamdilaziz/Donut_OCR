@@ -8,8 +8,8 @@
 #SBATCH --hint=nomultithread         # we get physical cores not logical
 #SBATCH --distribution=block:block   # we pin the tasks on contiguous cores
 #SBATCH --time=05:00:00              # maximum execution time (HH:MM:SS)
-#SBATCH --output=compute_metrics.out
-#SBATCH --error=compute_metrics_errors.out     
+#SBATCH --output=encoder_only/trainer_encoder_only.out
+#SBATCH --error=encoder_only/trainer_encoder_only_errors.out     
 #SBATCH -A jqv@a100
 #SBATCH -C a100                
 set -x
@@ -17,4 +17,4 @@ module load cpuarch/amd
 module load pytorch-gpu/py3/1.13.0 
 export PYTHONWARNINGS="ignore" 
  
-python3 compute_metrics.py
+python3 trainer_encoder_only.py
