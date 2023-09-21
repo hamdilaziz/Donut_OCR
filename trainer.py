@@ -43,7 +43,7 @@ test_names = list(test_set.keys())
 config = {
   "mean":[0.485, 0.456, 0.406],
   "std":[0.229, 0.224, 0.225],
-  "image_size":[960, 1280],
+  "image_size":[1920, 2560],
   "max_length":224,
   "batch_size":10,
   "learning_rate":1e-6,
