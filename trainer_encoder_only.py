@@ -49,7 +49,7 @@ config = {
   "batch_size":4,
   "learning_rate":1e-6,
   "device":'cuda' if torch.cuda.is_available() else 'cpu',
-  "epochs":30
+  "epochs":40
 }
 
 # dataset
