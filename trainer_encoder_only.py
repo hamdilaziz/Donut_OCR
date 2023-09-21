@@ -46,7 +46,7 @@ config = {
   "std":[0.229, 0.224, 0.225],
   "image_size":[1920, 2560],
   "max_length":224,
-  "batch_size":4,
+  "batch_size":2,
   "learning_rate":1e-6,
   "device":'cuda' if torch.cuda.is_available() else 'cpu',
   "epochs":40
