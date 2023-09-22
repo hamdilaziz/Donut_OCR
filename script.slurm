@@ -8,8 +8,8 @@
 #SBATCH --hint=nomultithread         # we get physical cores not logical
 #SBATCH --distribution=block:block   # we pin the tasks on contiguous cores
 #SBATCH --time=07:00:00              # maximum execution time (HH:MM:SS)
-#SBATCH --output=decoder_and_cross/encoder_only.out
-#SBATCH --error=decoder_and_cross/encoder_only_errors.out     
+#SBATCH --output=encoder_only/encoder_only.out
+#SBATCH --error=encoder_only/encoder_only_errors.out     
 #SBATCH -A jqv@a100
 #SBATCH -C a100                
 set -x
