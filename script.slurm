@@ -7,7 +7,7 @@
 #SBATCH --cpus-per-task=8          # number de coeurs CPU alloués à la tâche
 #SBATCH --hint=nomultithread         # we get physical cores not logical
 #SBATCH --distribution=block:block   # we pin the tasks on contiguous cores
-#SBATCH --time=07:00:00              # maximum execution time (HH:MM:SS)
+#SBATCH --time=014:00:00              # maximum execution time (HH:MM:SS)
 #SBATCH --output=encoder_only/encoder_only.out
 #SBATCH --error=encoder_only/encoder_only_errors.out     
 #SBATCH -A jqv@a100
