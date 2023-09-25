@@ -8,8 +8,8 @@
 #SBATCH --hint=nomultithread         # we get physical cores not logical
 #SBATCH --distribution=block:block   # we pin the tasks on contiguous cores
 #SBATCH --time=014:00:00              # maximum execution time (HH:MM:SS)
-#SBATCH --output=all/output.out
-#SBATCH --error=all/error.out     
+#SBATCH --output=metrics_result/output.out
+#SBATCH --error=metrics_result/error.out     
 #SBATCH -A jqv@a100
 #SBATCH -C a100                
 set -x
