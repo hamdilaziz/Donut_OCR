@@ -28,7 +28,7 @@ test_names = list(test_set.keys())
 config = {
   "path" : "/gpfsstore/rech/jqv/ubb84id/output_models",
   "model_names":["donut_decoder_cross_lr1e-06_h2560_w1920", "donut_decoder_after_encoder_lr1e-06_h2560_w1920","donut_encoder_after_decoder_lr1e-06_h2560_w1920",
-                 "donut_encoder_only_lr1e-06_h2560_w1920"],
+                 "donut_encoder_only_lr1e-06_h2560_w1920", "donut_encoder_decoder_all_lr1e-06_h2560_w1920"],
   "mean":[0.485, 0.456, 0.406],
   "std":[0.229, 0.224, 0.225],
   "image_size":[1920, 2560],
