@@ -1,44 +1,14 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import os
-import random
-
 import torch 
 from transformers import VisionEncoderDecoderModel, DonutProcessor
-import wandb
 from tqdm.notebook import tqdm
 from torch.utils.data import Dataset, DataLoader
 import cv2 as cv
 import json
-import re
-import editdistance
+from metrics import edit_cer_from_string, edit_wer_from_string
 
-#####################" cer thomas
-def keep_all_but_tokens(str, tokens):
-    """
-    Remove all layout tokens from string
-    """
-    return re.sub('([' + tokens + '])', '', str)
-
-def format_string_for_cer(str, layout_tokens):
-    """
-    Format string for CER computation: remove layout tokens and extra spaces
-    """
-    if layout_tokens is not None:
-        str = keep_all_but_tokens(str, layout_tokens)  # remove layout tokens from metric
-    str = re.sub('([\n])+', "\n", str)  # remove consecutive line breaks
-    str = re.sub('([ ])+', " ", str).strip()  # remove consecutive spaces
-    return str
-
-def edit_cer_from_string(gt, pred, layout_tokens=None):
-    """
-    Format and compute edit distance between two strings at character level
-    """
-    gt = format_string_for_cer(gt, layout_tokens)
-    pred = format_string_for_cer(pred, layout_tokens)
-    return editdistance.eval(gt, pred)
-
-####################################
 data_root = "/gpfsstore/rech/jqv/ubb84id/data/IAM"
 sub_folder_name = "IAM_page_sem"
 json_name = "formatted-IAM-DB-subwords-bart.json"
@@ -117,6 +87,7 @@ f = open('metrics.txt', mode='w')
 for model_name in config['model_names']:
     model = VisionEncoderDecoderModel.from_pretrained(os.path.join(config["path"], model_name))
     cer_list = []
+    wer_list = []
     model.eval()
     model.to(config['device'])
     with torch.no_grad():
@@ -129,16 +100,18 @@ for model_name in config['model_names']:
     
             # for i in range(config['batch_size']):
             # img = np.moveaxis(x_test[i].detach().cpu().numpy(), 0,2)
-            i = 0
-            tokens = tokenizer.convert_ids_to_tokens(y_test[i].detach().cpu())
+    
+            tokens = tokenizer.convert_ids_to_tokens(y_test[0].detach().cpu())
             text = tokenizer.convert_tokens_to_string([t for t in tokens if t not in sepcial_tokens])
             
-            pred_tokens = tokenizer.convert_ids_to_tokens(preds[i])
+            pred_tokens = tokenizer.convert_ids_to_tokens(preds[0])
             pred_text = tokenizer.convert_tokens_to_string([t for t in pred_tokens if t not in sepcial_tokens])
-            cer_list.append(edit_cer_from_string(text, pred_text)/len(text))
+            cer = edit_cer_from_string(text, pred_text)/len(text)
+            wer = edit_wer_from_string(text, pred_text)/len(text)
+            
+            cer_list.append(cer)
+            wer_list.append(wer)
                 
-    f.write("Model : {}, CER : {}\n".format(model_name, np.mean(cer_list)))
+    f.write("Model : {}, CER : {}, WER : {}\n".format(model_name, np.mean(cer_list), np.mean(wer_list))
                                                       
-
-    
 f.close()
