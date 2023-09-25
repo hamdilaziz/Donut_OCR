@@ -107,7 +107,7 @@ for model_name in config['model_names']:
             pred_tokens = tokenizer.convert_ids_to_tokens(preds[0])
             pred_text = tokenizer.convert_tokens_to_string([t for t in pred_tokens if t not in sepcial_tokens])
             cer = edit_cer_from_string(text, pred_text)/len(text)
-            wer = edit_wer_from_string(text, pred_text)/len(text)
+            wer = edit_wer_from_string(text, pred_text)/len(text.split())
             
             cer_list.append(cer)
             wer_list.append(wer)
