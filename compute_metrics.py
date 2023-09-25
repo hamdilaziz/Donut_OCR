@@ -106,13 +106,12 @@ for model_name in config['model_names']:
             
             pred_tokens = tokenizer.convert_ids_to_tokens(preds[0])
             pred_text = tokenizer.convert_tokens_to_string([t for t in pred_tokens if t not in sepcial_tokens])
-            cer = edit_cer_from_string(text, pred_text)/len(text)
-            wer = edit_wer_from_string(text, pred_text)/len(text.split())
+            cer = edit_cer_from_string(text, pred_text)
+            wer = edit_wer_from_string(text, pred_text)
             
             cer_list.append(cer)
             wer_list.append(wer)
                 
-    f.write("Model : {}, CER : {}, WER : {}\n".format(model_name, np.mean(cer_list), np.mean(wer_list)))
-    print("Model : {}, CER : {}, WER : {}".format(model_name, np.mean(cer_list), np.mean(wer_list)))
+    f.write("Model : {}, CER : {}, WER : {} | char_nb : {}, word_nb : {}\n".format(model_name, np.mean(cer_list), np.mean(wer_list), len(text), len(text.split())))
                                                       
 f.close()
