@@ -113,5 +113,6 @@ for model_name in config['model_names']:
             wer_list.append(wer)
                 
     f.write("Model : {}, CER : {}, WER : {}\n".format(model_name, np.mean(cer_list), np.mean(wer_list)))
+    print("Model : {}, CER : {}, WER : {}".format(model_name, np.mean(cer_list), np.mean(wer_list)))
                                                       
 f.close()
