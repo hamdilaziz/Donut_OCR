@@ -57,11 +57,11 @@ test_names = list(test_set.keys())
 # parameters    
 config = {
   "path" : "/gpfsstore/rech/jqv/ubb84id/output_models",
-  "model_names":["donut_all_lr1e-05_h1280_w960", "donut_all_lr5e-06_h1280_w960","donut_encoder_only_lr1e-06_h1280_w960",
-                 "donut_all_lr1e-06_h1280_w960", "donut_encoder_only_lr1e-05_h1280_w960", "donut_encoder_only_lr5e-06_h1280_w960"],
+  "model_names":["donut_decoder_cross_lr1e-06_h2560_w1920", "donut_decoder_after_encoder_lr1e-06_h2560_w1920","donut_encoder_after_decoder_lr1e-06_h2560_w1920",
+                 "donut_encoder_only_lr1e-06_h2560_w1920"],
   "mean":[0.485, 0.456, 0.406],
   "std":[0.229, 0.224, 0.225],
-  "image_size":[960, 1280],
+  "image_size":[1920, 2560],
   "max_length":224,
   "batch_size":1,
   "device":'cuda' if torch.cuda.is_available() else 'cpu',
@@ -72,7 +72,7 @@ class IAM_dataset(Dataset):
     def __init__(self, 
                  paths,
                  data_set, 
-                 data_folder_path = "/gpfsstore/rech/jqv/ubb84id/data/IAM/1280_960",
+                 data_folder_path = "/gpfsstore/rech/jqv/ubb84id/data/IAM/2560_1920",
                  device='cpu',
                  ext='.pt'):
         
