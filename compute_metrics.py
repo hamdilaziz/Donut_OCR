@@ -113,7 +113,7 @@ tokenizer = processor.tokenizer
 # evaluation
 sepcial_tokens = tokenizer.special_tokens_map.values()
 cer = {}
-f = open('result.txt', mode='w')
+f = open('metrics.txt', mode='w')
 for model_name in config['model_names']:
     model = VisionEncoderDecoderModel.from_pretrained(os.path.join(config["path"], model_name))
     cer_list = []
