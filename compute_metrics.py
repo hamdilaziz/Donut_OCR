@@ -26,7 +26,7 @@ test_names = list(test_set.keys())
 models_path = "/gpfsstore/rech/jqv/ubb84id/output_models"
 # parameters    
 config = {
-  "model_names":os.path.listdir(models_path),
+  "model_names":os.listdir(models_path),
   "mean":[0.485, 0.456, 0.406],
   "std":[0.229, 0.224, 0.225],
   "image_size":[1920, 2560],
