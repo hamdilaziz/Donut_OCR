@@ -82,8 +82,8 @@ tokenizer = processor.tokenizer
 sepcial_tokens = tokenizer.special_tokens_map.values()
 cer = {}
 f = open('metrics_result/sample.txt', mode='w')
-batch = next(iter(test_indices))
-x_test,y_test = test_dataset[batch]
+# batch = next(iter(test_indices))
+x_test,y_test = test_dataset[[0]]
 tokens = tokenizer.convert_ids_to_tokens(y_test[0].detach().cpu())
 text = tokenizer.convert_tokens_to_string([t for t in tokens if t not in sepcial_tokens])
 f.write("######################## Ground truth ############################\n")
