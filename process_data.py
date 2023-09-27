@@ -60,9 +60,8 @@ os.mkdir(os.path.join(data_folder_path, data_folder_name,'valid'))
 os.mkdir(os.path.join(data_folder_path, data_folder_name,'valid','images'))
 os.mkdir(os.path.join(data_folder_path, data_folder_name,'valid','gt'))
 # processing     
-name = valid_names[0]
-for name in valid_names:
-    gt = valid_set[name]['pages'][0]["text"][1:-1]
+for name in test_names:
+    gt = test_set[name]['pages'][0]["text"][1:-1]
     img = plt.imread(os.path.join(data_folder_path, sub_folder_name, imgs_folder, name))
     img = cv.cvtColor(img, cv.COLOR_GRAY2RGB)
     img = cv.resize(img, tuple(config['image_size']), cv.INTER_AREA)
@@ -75,8 +74,8 @@ for name in valid_names:
                        padding="max_length",
                        truncation=False,
                        return_tensors = 'pt')
-    torch.save(normalized, os.path.join(data_folder_path, data_folder_name, 'valid','images', name.split('.')[0]+ext))
-    torch.save(labels, os.path.join(data_folder_path, data_folder_name, 'valid','gt', name.split('.')[0]+ext))
+    torch.save(normalized, os.path.join(data_folder_path, data_folder_name, 'test','images', name.split('.')[0]+ext))
+    torch.save(labels, os.path.join(data_folder_path, data_folder_name, 'test','gt', name.split('.')[0]+ext))
     
 # for names,dt_set,out_set in zip([train_names, valid_names, test_names], [train_set, valid_set, test_set], ['train','valid','test']):
 #   for name in tqdm(names):
