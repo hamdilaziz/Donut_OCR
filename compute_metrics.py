@@ -100,7 +100,7 @@ for model_name in config['model_names']:
         pred_text = tokenizer.convert_tokens_to_string([t for t in pred_tokens if t not in sepcial_tokens])
         f.write("####################### {} ####################################\n".format(pred_text))
         f.write(pred_text+"\n")
-    f.close()
+f.close()
 #####################################"
 # f = open('metrics_result/metrics.txt', mode='w')
 # for model_name in config['model_names']:
