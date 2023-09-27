@@ -58,7 +58,7 @@ if os.path.exists(os.path.join(data_folder_path, data_folder_name)) == False:
 
 # processing     
 for names,dt_set,out_set in zip([train_names, valid_names, test_names], [train_set, valid_set, test_set], ['train','valid','test']):
-  for name in tqdm(names[:1]):
+  for name in tqdm(names):
     gt = dt_set[name]['pages'][0]["text"][1:-1]
     img = plt.imread(os.path.join(data_folder_path, sub_folder_name, imgs_folder, name))
     img = cv.cvtColor(img, cv.COLOR_GRAY2RGB)
@@ -66,19 +66,12 @@ for names,dt_set,out_set in zip([train_names, valid_names, test_names], [train_s
     tensor_image = fn.to_tensor(img)
     normalize = fn.normalize(tensor_image, mean=config['mean'], std=config['std'])
     normalize = normalize.unsqueeze(0)
-    # inputs = processor(
-    #     img,
-    #     text = gt,
-    #     add_special_tokens=True,
-    #     max_length=config['max_length'],
-    #     padding="max_length",
-    #     truncation=False,
-    #     return_tensors = 'pt',
-    # )
+    labels = tokenizer(gt,
+                       add_special_tokens=True,
+                       max_length=max_length,
+                       padding="max_length",
+                       truncation=False,
+                       return_tensors = 'pt')
     # save
-    torch.save(normalize, name.split('.')[0]+ext)
-    x = np.moveaxis(normalize[0].numpy(), 0,2)
-    plt.figure(figsize=(14,10))
-    plt.imshow(x)
-    plt.savefig(name)
-    # torch.save(inputs['labels'], os.path.join(data_folder_path, data_folder_name, out_set,'gt', name.split('.')[0]+ext))
+    torch.save(normalize, os.path.join(data_folder_path, data_folder_name, out_set,'images', name.split('.')[0]+ext))
+    torch.save(labels, os.path.join(data_folder_path, data_folder_name, out_set,'gt', name.split('.')[0]+ext))
