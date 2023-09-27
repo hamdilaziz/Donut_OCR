@@ -41,7 +41,7 @@ test_names = list(test_set.keys())
 
 # parameters
 config = {
-  "part":"decoder_encoder_all",
+  "part":"decoder",
   "mean":[0.485, 0.456, 0.406],
   "std":[0.229, 0.224, 0.225],
   "image_size":[1920, 2560],
@@ -163,7 +163,7 @@ for epoch in tqdm(range(config['epochs'])):
                 print("img size {}, Train loss {}, valid loss {}, cer {}, wer {}".format(x_valid.shape, train_loss.mean().item(), valid_loss, cer, wer))
             if valid_loss < best_valid_loss:
                 best_valid_loss = valid_loss
-                output_folder_name = "encoder_only_lr{}_h{}_w{}".format(config['learning_rate'], config['image_size'][1], config['image_size'][0])
+                output_folder_name = "decoder_lr{}_h{}_w{}".format(config['learning_rate'], config['image_size'][1], config['image_size'][0])
                 model.save_pretrained("/gpfsstore/rech/jqv/ubb84id/output_models/"+output_folder_name)
                 with open("/gpfsstore/rech/jqv/ubb84id/output_models/"+output_folder_name+"/info.txt", "w") as f:
                     f.write("checkpoints created at step: {} with train loss : {} and valid loss : {}".format(step, train_loss, best_valid_loss))
