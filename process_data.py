@@ -62,18 +62,18 @@ for names,dt_set,out_set in zip([train_names, valid_names, test_names], [train_s
     img = plt.imread(os.path.join(data_folder_path, sub_folder_name, imgs_folder, name))
     img = cv.cvtColor(img, cv.COLOR_GRAY2RGB)
     img = cv.resize(img, tuple(config['image_size']), cv.INTER_AREA)
-    plt.figure()
-    plt.imshow(img)
-    plt.savefig(name)
-    inputs = processor(
-        img,
-        text = gt,
-        add_special_tokens=True,
-        max_length=config['max_length'],
-        padding="max_length",
-        truncation=False,
-        return_tensors = 'pt',
-    )
+    tensor_image = fn.to_tensor(img)
+    normalize = fn.normalize(tensor_image, mean=config['mean'], std=config['std'])
+    normalize = normalize.unsqueeze(0)
+    # inputs = processor(
+    #     img,
+    #     text = gt,
+    #     add_special_tokens=True,
+    #     max_length=config['max_length'],
+    #     padding="max_length",
+    #     truncation=False,
+    #     return_tensors = 'pt',
+    # )
     # save
-    torch.save(inputs['pixel_values'], name.split('.')[0]+ext)
+    torch.save(normalize, name.split('.')[0]+ext)
     # torch.save(inputs['labels'], os.path.join(data_folder_path, data_folder_name, out_set,'gt', name.split('.')[0]+ext))
