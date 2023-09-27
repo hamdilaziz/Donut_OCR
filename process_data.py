@@ -1,17 +1,19 @@
+# import librairies
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import os
 import random
-
+from tqdm.notebook import tqdm
+import cv2 as cv
+import json 
+# deep learning lb
 import torch 
 import torchvision.transforms.functional as fn
 from transformers import DonutProcessor
-from tqdm.notebook import tqdm
 from torch.utils.data import Dataset, DataLoader
-import cv2 as cv
-import json 
 
+# original data variables
 data_folder_path = "/gpfsstore/rech/jqv/ubb84id/data/IAM"
 sub_folder_name = "IAM_page_sem"
 json_name = "formatted-IAM-DB-subwords-bart.json"
@@ -37,7 +39,6 @@ config = {
 
 # load donut processor
 processor = DonutProcessor.from_pretrained("/gpfsstore/rech/jqv/ubb84id/huggingface_models/donut/processor")
-
 processor.image_processor.size = config['image_size']
 processor.image_processor.mean = config['mean']
 processor.image_processor.std = config['std']
@@ -57,21 +58,37 @@ if os.path.exists(os.path.join(data_folder_path, data_folder_name)) == False:
       os.mkdir(os.path.join(data_folder_path, data_folder_name,d,m))
 
 # processing     
-for names,dt_set,out_set in zip([train_names, valid_names, test_names], [train_set, valid_set, test_set], ['train','valid','test']):
-  for name in tqdm(names):
-    gt = dt_set[name]['pages'][0]["text"][1:-1]
-    img = plt.imread(os.path.join(data_folder_path, sub_folder_name, imgs_folder, name))
-    img = cv.cvtColor(img, cv.COLOR_GRAY2RGB)
-    img = cv.resize(img, tuple(config['image_size']), cv.INTER_AREA)
-    tensor_image = fn.to_tensor(img)
-    normalize = fn.normalize(tensor_image, mean=config['mean'], std=config['std'])
-    normalize = normalize.unsqueeze(0)
-    labels = tokenizer(gt,
-                       add_special_tokens=True,
-                       max_length=config['max_length'],
-                       padding="max_length",
-                       truncation=False,
-                       return_tensors = 'pt')
-    # save
-    torch.save(normalize, os.path.join(data_folder_path, data_folder_name, out_set,'images', name.split('.')[0]+ext))
-    torch.save(labels, os.path.join(data_folder_path, data_folder_name, out_set,'gt', name.split('.')[0]+ext))
+name = valid_names[0]
+gt = valid_set[name]['pages'][0]["text"][1:-1]
+img = plt.imread(os.path.join(data_folder_path, sub_folder_name, imgs_folder, name))
+img = cv.cvtColor(img, cv.COLOR_GRAY2RGB)
+img = cv.resize(img, tuple(config['image_size']), cv.INTER_AREA)
+tensor_image = fn.to_tensor(img)
+normalized = fn.normalize(tensor_image, mean=config['mean'], std=config['std'])
+normalized = normalize.unsqueeze(0)
+labels = tokenizer(gt,
+                   add_special_tokens=True,
+                   max_length=config['max_length'],
+                   padding="max_length",
+                   truncation=False,
+                   return_tensors = 'pt')
+torch.save(normalized,'sample.pt')
+
+# for names,dt_set,out_set in zip([train_names, valid_names, test_names], [train_set, valid_set, test_set], ['train','valid','test']):
+#   for name in tqdm(names):
+#     gt = dt_set[name]['pages'][0]["text"][1:-1]
+#     img = plt.imread(os.path.join(data_folder_path, sub_folder_name, imgs_folder, name))
+#     img = cv.cvtColor(img, cv.COLOR_GRAY2RGB)
+#     img = cv.resize(img, tuple(config['image_size']), cv.INTER_AREA)
+#     tensor_image = fn.to_tensor(img)
+#     normalize = fn.normalize(tensor_image, mean=config['mean'], std=config['std'])
+#     normalize = normalize.unsqueeze(0)
+#     labels = tokenizer(gt,
+#                        add_special_tokens=True,
+#                        max_length=config['max_length'],
+#                        padding="max_length",
+#                        truncation=False,
+#                        return_tensors = 'pt')
+#     # save
+#     torch.save(normalize, os.path.join(data_folder_path, data_folder_name, out_set,'images', name.split('.')[0]+ext))
+#     torch.save(labels, os.path.join(data_folder_path, data_folder_name, out_set,'gt', name.split('.')[0]+ext))
