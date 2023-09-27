@@ -90,6 +90,8 @@ f.write("######################## Ground truth ############################\n")
 f.write(text+"\n")
 for model_name in config['model_names']:
     model = VisionEncoderDecoderModel.from_pretrained(os.path.join(models_path, model_name))
+    model.eval()
+    model.to(config['device'])
     output = model(**{'pixel_values':x_test, 'labels':y_test})
     logits = output.logits
     preds = logits.argmax(-1).detach().cpu()
