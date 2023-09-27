@@ -98,7 +98,7 @@ for model_name in config['model_names']:
         preds = logits.argmax(-1).detach().cpu()
         pred_tokens = tokenizer.convert_ids_to_tokens(preds[0])
         pred_text = tokenizer.convert_tokens_to_string([t for t in pred_tokens if t not in sepcial_tokens])
-        f.write("####################### {} ####################################\n".format(pred_text))
+        f.write("####################### {} ####################################\n".format(model_name))
         f.write(pred_text+"\n")
 f.close()
 #####################################"
