@@ -5,6 +5,7 @@ import os
 import random
 
 import torch 
+import torchvision.transforms.functional as fn
 from transformers import DonutProcessor
 from tqdm.notebook import tqdm
 from torch.utils.data import Dataset, DataLoader
