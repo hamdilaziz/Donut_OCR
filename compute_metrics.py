@@ -82,34 +82,53 @@ tokenizer = processor.tokenizer
 sepcial_tokens = tokenizer.special_tokens_map.values()
 cer = {}
 f = open('metrics_result/metrics.txt', mode='w')
+batch = next(iter(test_indices)):
+x_test,y_test = test_dataset[batch]
+tokens = tokenizer.convert_ids_to_tokens(y_test[0].detach().cpu())
+text = tokenizer.convert_tokens_to_string([t for t in tokens if t not in sepcial_tokens])
+f.write("######################## Ground truth ############################\n")
+f.write(text+"\n")
 for model_name in config['model_names']:
     model = VisionEncoderDecoderModel.from_pretrained(os.path.join(models_path, model_name))
-    cer_list = []
-    wer_list = []
-    model.eval()
-    model.to(config['device'])
-    with torch.no_grad():
-        for batch in tqdm(test_indices):
-            x_test,y_test = test_dataset[batch]
-            output = model(**{'pixel_values':x_test, 'labels':y_test})
-            # test_loss = output.loss.mean().item()
-            logits = output.logits
-            preds = logits.argmax(-1).detach().cpu()
-    
-            # for i in range(config['batch_size']):
-            # img = np.moveaxis(x_test[i].detach().cpu().numpy(), 0,2)
-    
-            tokens = tokenizer.convert_ids_to_tokens(y_test[0].detach().cpu())
-            text = tokenizer.convert_tokens_to_string([t for t in tokens if t not in sepcial_tokens])
-            
-            pred_tokens = tokenizer.convert_ids_to_tokens(preds[0])
-            pred_text = tokenizer.convert_tokens_to_string([t for t in pred_tokens if t not in sepcial_tokens])
-            cer = edit_cer_from_string(text, pred_text)/len(text)
-            wer = edit_wer_from_string(text, pred_text)/len(text.split())
-            
-            cer_list.append(cer)
-            wer_list.append(wer)
-                
-    f.write("Model : {}, CER : {}, WER : {} | char_nb : {}, word_nb : {}\n".format(model_name, np.mean(cer_list), np.mean(wer_list), len(text), len(text.split())))
-                                                      
+    output = model(**{'pixel_values':x_test, 'labels':y_test})
+    logits = output.logits
+    preds = logits.argmax(-1).detach().cpu()
+    pred_tokens = tokenizer.convert_ids_to_tokens(preds[0])
+    pred_text = tokenizer.convert_tokens_to_string([t for t in pred_tokens if t not in sepcial_tokens])
+    f.write("####################### {} ####################################\n".format(pred_text))
+    f.write(pred_text+"\n")
 f.close()
+#####################################"
+# f = open('metrics_result/metrics.txt', mode='w')
+# for model_name in config['model_names']:
+#     model = VisionEncoderDecoderModel.from_pretrained(os.path.join(models_path, model_name))
+#     cer_list = []
+#     wer_list = []
+#     model.eval()
+#     model.to(config['device'])
+#     batch
+#     with torch.no_grad():
+#         for batch in tqdm(test_indices):
+#             x_test,y_test = test_dataset[batch]
+#             output = model(**{'pixel_values':x_test, 'labels':y_test})
+#             # test_loss = output.loss.mean().item()
+#             logits = output.logits
+#             preds = logits.argmax(-1).detach().cpu()
+    
+#             # for i in range(config['batch_size']):
+#             # img = np.moveaxis(x_test[i].detach().cpu().numpy(), 0,2)
+    
+#             tokens = tokenizer.convert_ids_to_tokens(y_test[0].detach().cpu())
+#             text = tokenizer.convert_tokens_to_string([t for t in tokens if t not in sepcial_tokens])
+            
+#             pred_tokens = tokenizer.convert_ids_to_tokens(preds[0])
+#             pred_text = tokenizer.convert_tokens_to_string([t for t in pred_tokens if t not in sepcial_tokens])
+#             cer = edit_cer_from_string(text, pred_text)/len(text)
+#             wer = edit_wer_from_string(text, pred_text)/len(text.split())
+            
+#             cer_list.append(cer)
+#             wer_list.append(wer)
+                
+#     f.write("Model : {}, CER : {}, WER : {} | char_nb : {}, word_nb : {}\n".format(model_name, np.mean(cer_list), np.mean(wer_list), len(text), len(text.split())))
+                                                      
+# f.close()
