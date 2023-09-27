@@ -81,7 +81,7 @@ tokenizer = processor.tokenizer
 # evaluation
 sepcial_tokens = tokenizer.special_tokens_map.values()
 cer = {}
-f = open('metrics_result/metrics.txt', mode='w')
+f = open('metrics_result/sample.txt', mode='w')
 batch = next(iter(test_indices)):
 x_test,y_test = test_dataset[batch]
 tokens = tokenizer.convert_ids_to_tokens(y_test[0].detach().cpu())
