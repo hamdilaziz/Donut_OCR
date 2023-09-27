@@ -136,6 +136,7 @@ best_valid_loss = float('inf')
 for epoch in tqdm(range(config['epochs'])):
     for batch in tqdm(train_indices):
         # training
+        print(batch)
         x_train,y_train = train_dataset[batch]
         output = model(**{'pixel_values':x_train, 'labels':y_train})
         train_loss = output.loss
@@ -146,7 +147,6 @@ for epoch in tqdm(range(config['epochs'])):
             model.eval()
             with torch.no_grad():
                 batch = next(iter(valid_indices))
-                print(batch)
                 x_valid,y_valid = valid_dataset[batch]
                 output = model(**{'pixel_values':x_valid, 'labels':y_valid})
                 valid_loss = output.loss.mean().item()
