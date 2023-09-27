@@ -56,7 +56,9 @@ if os.path.exists(os.path.join(data_folder_path, data_folder_name)) == False:
     os.mkdir(os.path.join(data_folder_path, data_folder_name,d))
     for m in ['images','gt']:
       os.mkdir(os.path.join(data_folder_path, data_folder_name,d,m))
-
+os.mkdir(os.path.join(data_folder_path, data_folder_name,'valid'))        
+os.mkdir(os.path.join(data_folder_path, data_folder_name,'valid','images'))
+os.mkdir(os.path.join(data_folder_path, data_folder_name,'valid','gt'))
 # processing     
 name = valid_names[0]
 for name in valid_names:
