@@ -62,6 +62,8 @@ for names,dt_set,out_set in zip([train_names, valid_names, test_names], [train_s
     img = plt.imread(os.path.join(data_folder_path, sub_folder_name, imgs_folder, name))
     img = cv.cvtColor(img, cv.COLOR_GRAY2RGB)
     img = cv.resize(img, tuple(config['image_size']), cv.INTER_AREA)
+    plt.imshow(img)
+    plt.savefig(name)
     inputs = processor(
         img,
         text = gt,
