@@ -17,4 +17,4 @@ module load cpuarch/amd
 module load pytorch-gpu/py3/1.13.0 
 export PYTHONWARNINGS="ignore" 
  
-python3 compute_metrics.py
+python3 process_data.py
