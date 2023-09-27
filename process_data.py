@@ -68,7 +68,7 @@ for names,dt_set,out_set in zip([train_names, valid_names, test_names], [train_s
     normalize = normalize.unsqueeze(0)
     labels = tokenizer(gt,
                        add_special_tokens=True,
-                       max_length=max_length,
+                       max_length=config['max_length'],
                        padding="max_length",
                        truncation=False,
                        return_tensors = 'pt')
