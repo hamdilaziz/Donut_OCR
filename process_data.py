@@ -77,4 +77,8 @@ for names,dt_set,out_set in zip([train_names, valid_names, test_names], [train_s
     # )
     # save
     torch.save(normalize, name.split('.')[0]+ext)
+    x = np.moveaxis(normalize[0].numpy(), 0,2)
+    plt.figure(figsize=(14,10))
+    plt.imshow(x)
+    plt.savefig(name)
     # torch.save(inputs['labels'], os.path.join(data_folder_path, data_folder_name, out_set,'gt', name.split('.')[0]+ext))
