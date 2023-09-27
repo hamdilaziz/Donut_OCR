@@ -65,7 +65,7 @@ img = cv.cvtColor(img, cv.COLOR_GRAY2RGB)
 img = cv.resize(img, tuple(config['image_size']), cv.INTER_AREA)
 tensor_image = fn.to_tensor(img)
 normalized = fn.normalize(tensor_image, mean=config['mean'], std=config['std'])
-normalized = normalize.unsqueeze(0)
+normalized = normalized.unsqueeze(0)
 labels = tokenizer(gt,
                    add_special_tokens=True,
                    max_length=config['max_length'],
