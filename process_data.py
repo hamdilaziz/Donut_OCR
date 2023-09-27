@@ -72,7 +72,7 @@ for name in test_names:
                        truncation=False,
                        return_tensors = 'pt')
     torch.save(normalized, os.path.join(data_folder_path, data_folder_name, 'test','images', name.split('.')[0]+ext))
-    torch.save(labels, os.path.join(data_folder_path, data_folder_name, 'test','gt', name.split('.')[0]+ext))
+    torch.save(labels['input_ids'], os.path.join(data_folder_path, data_folder_name, 'test','gt', name.split('.')[0]+ext))
     
 # for names,dt_set,out_set in zip([train_names, valid_names, test_names], [train_set, valid_set, test_set], ['train','valid','test']):
 #   for name in tqdm(names):
