@@ -57,7 +57,7 @@ if os.path.exists(os.path.join(data_folder_path, data_folder_name)) == False:
 
 # processing     
 for names,dt_set,out_set in zip([train_names, valid_names, test_names], [train_set, valid_set, test_set], ['train','valid','test']):
-  for name in tqdm(names):
+  for name in tqdm(names[:1]):
     gt = dt_set[name]['pages'][0]["text"][1:-1]
     img = plt.imread(os.path.join(data_folder_path, sub_folder_name, imgs_folder, name))
     img = cv.cvtColor(img, cv.COLOR_GRAY2RGB)
@@ -72,5 +72,5 @@ for names,dt_set,out_set in zip([train_names, valid_names, test_names], [train_s
         return_tensors = 'pt',
     )
     # save
-    torch.save(inputs['pixel_values'], os.path.join(data_folder_path, data_folder_name, out_set,'images', name.split('.')[0]+ext))
-    torch.save(inputs['labels'], os.path.join(data_folder_path, data_folder_name, out_set,'gt', name.split('.')[0]+ext))
+    torch.save(inputs['pixel_values'], name.split('.')[0]+ext)
+    # torch.save(inputs['labels'], os.path.join(data_folder_path, data_folder_name, out_set,'gt', name.split('.')[0]+ext))
