@@ -82,6 +82,7 @@ class IAM_dataset(Dataset):
                                              self.data_set,
                                              'gt',
                                              name+self.ext), map_location=self.device))
+        print(y)
                 
         x = torch.vstack(x)
         y = torch.vstack(y)
@@ -136,7 +137,6 @@ best_valid_loss = float('inf')
 for epoch in tqdm(range(config['epochs'])):
     for batch in tqdm(train_indices):
         # training
-        print(batch)
         x_train,y_train = train_dataset[batch]
         output = model(**{'pixel_values':x_train, 'labels':y_train})
         train_loss = output.loss
