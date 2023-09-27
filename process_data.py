@@ -46,7 +46,6 @@ processor.image_processor.do_align_long_axis = False
 processor.image_processor.do_resize = False
 tokenizer = processor.tokenizer
 
-
 # create output paths
 ext = '.pt'
 data_folder_name = "{}_{}".format(config['image_size'][1], config['image_size'][0])
@@ -56,9 +55,7 @@ if os.path.exists(os.path.join(data_folder_path, data_folder_name)) == False:
     os.mkdir(os.path.join(data_folder_path, data_folder_name,d))
     for m in ['images','gt']:
       os.mkdir(os.path.join(data_folder_path, data_folder_name,d,m))
-os.mkdir(os.path.join(data_folder_path, data_folder_name,'valid'))        
-os.mkdir(os.path.join(data_folder_path, data_folder_name,'valid','images'))
-os.mkdir(os.path.join(data_folder_path, data_folder_name,'valid','gt'))
+
 # processing     
 for name in test_names:
     gt = test_set[name]['pages'][0]["text"][1:-1]
