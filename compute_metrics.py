@@ -89,17 +89,18 @@ text = tokenizer.convert_tokens_to_string([t for t in tokens if t not in sepcial
 f.write("######################## Ground truth ############################\n")
 f.write(text+"\n")
 for model_name in config['model_names']:
-    model = VisionEncoderDecoderModel.from_pretrained(os.path.join(models_path, model_name))
-    model.eval()
-    model.to(config['device'])
-    output = model(**{'pixel_values':x_test, 'labels':y_test})
-    logits = output.logits
-    preds = logits.argmax(-1).detach().cpu()
-    pred_tokens = tokenizer.convert_ids_to_tokens(preds[0])
-    pred_text = tokenizer.convert_tokens_to_string([t for t in pred_tokens if t not in sepcial_tokens])
-    f.write("####################### {} ####################################\n".format(pred_text))
-    f.write(pred_text+"\n")
-f.close()
+    with torch.no_grad():
+        model = VisionEncoderDecoderModel.from_pretrained(os.path.join(models_path, model_name))
+        model.eval()
+        model.to(config['device'])
+        output = model(**{'pixel_values':x_test, 'labels':y_test})
+        logits = output.logits
+        preds = logits.argmax(-1).detach().cpu()
+        pred_tokens = tokenizer.convert_ids_to_tokens(preds[0])
+        pred_text = tokenizer.convert_tokens_to_string([t for t in pred_tokens if t not in sepcial_tokens])
+        f.write("####################### {} ####################################\n".format(pred_text))
+        f.write(pred_text+"\n")
+    f.close()
 #####################################"
 # f = open('metrics_result/metrics.txt', mode='w')
 # for model_name in config['model_names']:
