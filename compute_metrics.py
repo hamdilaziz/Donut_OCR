@@ -109,7 +109,6 @@ for model_name in config['model_names']:
     wer_list = []
     model.eval()
     model.to(config['device'])
-    batch
     with torch.no_grad():
         for batch in tqdm(test_indices):
             x_test,y_test = test_dataset[batch]
