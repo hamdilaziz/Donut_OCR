@@ -72,7 +72,7 @@ for names,dt_set,out_set in zip([train_names, valid_names, test_names], [train_s
                            padding="max_length",
                            truncation=False,
                            return_tensors = 'pt')
-        # torch.save(normalized, os.path.join(data_folder_path, data_folder_name, 'train','images', name.split('.')[0]+ext))
+        torch.save(normalized, os.path.join(data_folder_path, data_folder_name, 'train','images', name.split('.')[0]+ext))
         torch.save(labels['input_ids'], os.path.join(data_folder_path, data_folder_name, out_set,'gt', name.split('.')[0]+ext))
     
 # for names,dt_set,out_set in zip([train_names, valid_names, test_names], [train_set, valid_set, test_set], ['train','valid','test']):
