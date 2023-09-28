@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=encoder_decoder
+#SBATCH --job-name=metrics
 ##SBATCH -C v100-32g 
 #SBATCH --ntasks=1                   # number of MP tasks
 #SBATCH --ntasks-per-node=1          # number of MPI tasks per node
@@ -8,8 +8,8 @@
 #SBATCH --hint=nomultithread         # we get physical cores not logical
 #SBATCH --distribution=block:block   # we pin the tasks on contiguous cores
 #SBATCH --time=014:00:00              # maximum execution time (HH:MM:SS)
-#SBATCH --output=encoder/output.out
-#SBATCH --error=encoder/error.out     
+#SBATCH --output=metrics_result/output.out
+#SBATCH --error=metrics_result/error.out     
 #SBATCH -A jqv@v100
 #SBATCH -C v100                
 set -x
