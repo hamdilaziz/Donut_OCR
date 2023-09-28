@@ -10,11 +10,11 @@
 #SBATCH --time=014:00:00              # maximum execution time (HH:MM:SS)
 #SBATCH --output=decoder/output.out
 #SBATCH --error=decoder/error.out     
-#SBATCH -A jqv@a100
-#SBATCH -C a100                
+#SBATCH -A jqv@v100
+#SBATCH -C v100                
 set -x
 module load cpuarch/amd 
 module load pytorch-gpu/py3/1.13.0 
 export PYTHONWARNINGS="ignore" 
  
-python3 trainer.py
+python3 process_data.py
