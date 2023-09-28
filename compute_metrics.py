@@ -102,6 +102,7 @@ tokenizer = processor.tokenizer
 #         f.write(pred_text+"\n")
 # f.close()
 #####################################"
+sepcial_tokens = tokenizer.special_tokens_map.values()
 f = open('metrics_result/metrics.txt', mode='w')
 for model_name in config['model_names']:
     model = VisionEncoderDecoderModel.from_pretrained(os.path.join(models_path, model_name))
