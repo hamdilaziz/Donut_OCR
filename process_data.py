@@ -57,22 +57,23 @@ if os.path.exists(os.path.join(data_folder_path, data_folder_name)) == False:
       os.mkdir(os.path.join(data_folder_path, data_folder_name,d,m))
 
 # processing     
-for name in train_names:
-    gt = train_set[name]['pages'][0]["text"][1:-1]
-    # img = plt.imread(os.path.join(data_folder_path, sub_folder_name, imgs_folder, name))
-    # img = cv.cvtColor(img, cv.COLOR_GRAY2RGB)
-    # img = cv.resize(img, tuple(config['image_size']), cv.INTER_AREA)
-    # tensor_image = fn.to_tensor(img)
-    # normalized = fn.normalize(tensor_image, mean=config['mean'], std=config['std'])
-    # normalized = normalized.unsqueeze(0)
-    labels = tokenizer(gt,
-                       add_special_tokens=True,
-                       max_length=config['max_length'],
-                       padding="max_length",
-                       truncation=False,
-                       return_tensors = 'pt')
-    # torch.save(normalized, os.path.join(data_folder_path, data_folder_name, 'train','images', name.split('.')[0]+ext))
-    torch.save(labels['input_ids'], os.path.join(data_folder_path, data_folder_name, 'train','gt', name.split('.')[0]+ext))
+for names,dt_set,out_set in zip([train_names, valid_names, test_names], [train_set, valid_set, test_set], ['train','valid','test']):
+    for name in names:
+        gt = dt_set[name]['pages'][0]["text"][1:-1]
+        img = plt.imread(os.path.join(data_folder_path, sub_folder_name, imgs_folder, name))
+        img = cv.cvtColor(img, cv.COLOR_GRAY2RGB)
+        img = cv.resize(img, tuple(config['image_size']), cv.INTER_AREA)
+        tensor_image = fn.to_tensor(img)
+        normalized = fn.normalize(tensor_image, mean=config['mean'], std=config['std'])
+        normalized = normalized.unsqueeze(0)
+        labels = tokenizer(gt,
+                           add_special_tokens=True,
+                           max_length=config['max_length'],
+                           padding="max_length",
+                           truncation=False,
+                           return_tensors = 'pt')
+        # torch.save(normalized, os.path.join(data_folder_path, data_folder_name, 'train','images', name.split('.')[0]+ext))
+        torch.save(labels['input_ids'], os.path.join(data_folder_path, data_folder_name, out_set,'gt', name.split('.')[0]+ext))
     
 # for names,dt_set,out_set in zip([train_names, valid_names, test_names], [train_set, valid_set, test_set], ['train','valid','test']):
 #   for name in tqdm(names):
