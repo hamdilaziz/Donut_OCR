@@ -82,7 +82,6 @@ class IAM_dataset(Dataset):
                                              self.data_set,
                                              'gt',
                                              name+self.ext), map_location=self.device))
-        print(y)
                 
         x = torch.vstack(x)
         y = torch.vstack(y)
