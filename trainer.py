@@ -41,7 +41,7 @@ test_names = list(test_set.keys())
 
 # parameters
 config = {
-  "part":"decoder",
+  "part":"encoder",
   "mean":[0.485, 0.456, 0.406],
   "std":[0.229, 0.224, 0.225],
   "image_size":[1920, 2560],
@@ -126,7 +126,7 @@ run = wandb.init(project="Donut",
 # training forloop
 model.to(config['device'])
 # train only the decoder
-for p in model.encoder.parameters():
+for p in model.decoder.parameters():
     p.requires_grad = False
   
 opt = AdamW(model.parameters(), lr=config['learning_rate'])
@@ -163,7 +163,7 @@ for epoch in tqdm(range(config['epochs'])):
                 print("img size {}, Train loss {}, valid loss {}, cer {}, wer {}".format(x_valid.shape, train_loss.mean().item(), valid_loss, cer, wer))
             if valid_loss < best_valid_loss:
                 best_valid_loss = valid_loss
-                output_folder_name = "decoder_lr{}_h{}_w{}".format(config['learning_rate'], config['image_size'][1], config['image_size'][0])
+                output_folder_name = "encoder_lr{}_h{}_w{}".format(config['learning_rate'], config['image_size'][1], config['image_size'][0])
                 model.save_pretrained("/gpfsstore/rech/jqv/ubb84id/output_models/"+output_folder_name)
                 with open("/gpfsstore/rech/jqv/ubb84id/output_models/"+output_folder_name+"/info.txt", "w") as f:
                     f.write("checkpoints created at step: {} with train loss : {} and valid loss : {}".format(step, train_loss, best_valid_loss))
