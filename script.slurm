@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=metrics
+#SBATCH --job-name=enco_deco
 ##SBATCH -C v100-32g 
 #SBATCH --ntasks=1                   # number of MP tasks
 #SBATCH --ntasks-per-node=1          # number of MPI tasks per node
@@ -10,11 +10,11 @@
 #SBATCH --time=014:00:00              # maximum execution time (HH:MM:SS)
 #SBATCH --output=metrics_result/output.out
 #SBATCH --error=metrics_result/error.out     
-#SBATCH -A jqv@v100
-#SBATCH -C v100                
+#SBATCH -A jqv@a100
+#SBATCH -C a100                
 set -x
 module load cpuarch/amd 
 module load pytorch-gpu/py3/1.13.0 
 export PYTHONWARNINGS="ignore" 
  
-python3 compute_metrics.py
+python3 encoder_decoder_all.py
