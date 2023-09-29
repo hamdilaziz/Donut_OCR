@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=enco_deco
+#SBATCH --job-name=deco_enco
 ##SBATCH -C v100-32g 
 #SBATCH --ntasks=1                   # number of MP tasks
 #SBATCH --ntasks-per-node=1          # number of MPI tasks per node
@@ -8,8 +8,8 @@
 #SBATCH --hint=nomultithread         # we get physical cores not logical
 #SBATCH --distribution=block:block   # we pin the tasks on contiguous cores
 #SBATCH --time=014:00:00              # maximum execution time (HH:MM:SS)
-#SBATCH --output=all/output.out
-#SBATCH --error=all/error.out     
+#SBATCH --output=decoder/output.out
+#SBATCH --error=decoder/error.out     
 #SBATCH -A jqv@a100
 #SBATCH -C a100                
 set -x
