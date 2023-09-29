@@ -95,7 +95,7 @@ valid_indices = DataLoader(range(len(valid_dataset)), batch_size=config['batch_s
 
 # Load the model 
 processor = DonutProcessor.from_pretrained("/gpfsstore/rech/jqv/ubb84id/huggingface_models/donut/processor")
-model = VisionEncoderDecoderModel.from_pretrained("/gpfsstore/rech/jqv/ubb84id/output_models/decoder_encoder_lr1e-06_h2560_w1920")
+model = VisionEncoderDecoderModel.from_pretrained("/gpfsstore/rech/jqv/ubb84id/output_models/encoder_decoder_lr1e-06_h2560_w1920")
 
 processor.image_processor.size = config['image_size']
 processor.image_processor.mean = config['mean']
@@ -163,7 +163,7 @@ for epoch in tqdm(range(config['epochs'])):
                 print("img size {}, Train loss {}, valid loss {}, cer {}, wer {}".format(x_valid.shape, train_loss.mean().item(), valid_loss, cer, wer))
             if valid_loss < best_valid_loss:
                 best_valid_loss = valid_loss
-                output_folder_name = "decoder_encoder_all_lr{}_h{}_w{}".format(config['learning_rate'], config['image_size'][1], config['image_size'][0])
+                output_folder_name = "encoder_decoder_all_lr{}_h{}_w{}".format(config['learning_rate'], config['image_size'][1], config['image_size'][0])
                 model.save_pretrained("/gpfsstore/rech/jqv/ubb84id/output_models/"+output_folder_name)
                 with open("/gpfsstore/rech/jqv/ubb84id/output_models/"+output_folder_name+"/info.txt", "w") as f:
                     f.write("checkpoints created at step: {} with train loss : {} and valid loss : {}".format(step, train_loss, best_valid_loss))
