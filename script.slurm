@@ -17,4 +17,4 @@ module load cpuarch/amd
 module load pytorch-gpu/py3/1.13.0 
 export PYTHONWARNINGS="ignore" 
  
-python3 encoder_decoder_all.py
+python3 trainer.py
