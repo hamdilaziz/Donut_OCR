@@ -172,6 +172,7 @@ for epoch in tqdm(range(config['epochs'])):
         valid_loss += output.loss.mean().item()
     valid_loss = valid_loss/len(valid_indices)
     if valid_loss < best_valid_loss:
+        best_valid_loss = valid_loss
         output_folder_name = "encoder_lr{}_h{}_w{}".format(config['learning_rate'], config['image_size'][1], config['image_size'][0])
         model.save_pretrained("/gpfsstore/rech/jqv/ubb84id/output_models/"+output_folder_name)
         with open("/gpfsstore/rech/jqv/ubb84id/output_models/"+output_folder_name+"/info.txt", "w") as f:
