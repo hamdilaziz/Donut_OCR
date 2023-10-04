@@ -125,7 +125,7 @@ run = wandb.init(project="Donut",
 
 # training forloop
 model.to(config['device'])
-train only the encoder
+# train only the encoder
 for p in model.encoder.parameters():
     p.requires_grad = False
   
