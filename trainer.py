@@ -41,7 +41,7 @@ test_names = list(test_set.keys())
 
 # parameters
 config = {
-  "part":"decoder_encoder_all",
+  "part":"encoder",
   "mean":[0.485, 0.456, 0.406],
   "std":[0.229, 0.224, 0.225],
   "image_size":[1920, 2560],
@@ -162,7 +162,6 @@ for epoch in tqdm(range(config['epochs'])):
                 run.log({"train_loss":train_loss.mean().item(), "valid_loss":valid_loss, "cer":cer, "wer":wer})
                 print("img size {}, Train loss {}, valid loss {}, cer {}, wer {}".format(x_valid.shape, train_loss.mean().item(), valid_loss, cer, wer))
         step += 1
-
     #### compte loss over valid if valid loss is better save checkpoints
     model.eval()
     valid_loss = 0
