@@ -126,7 +126,7 @@ run = wandb.init(project="Donut",
 # training forloop
 model.to(config['device'])
 # train only the encoder
-for p in model.encoder.parameters():
+for p in model.decoder.parameters():
     p.requires_grad = False
   
 opt = AdamW(model.parameters(), lr=config['learning_rate'])
