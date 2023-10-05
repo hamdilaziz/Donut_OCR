@@ -41,7 +41,7 @@ test_names = list(test_set.keys())
 
 # parameters
 config = {
-  "part":"encoder",
+  "part":"decoder",
   "mean":[0.485, 0.456, 0.406],
   "std":[0.229, 0.224, 0.225],
   "image_size":[1920, 2560],
@@ -95,7 +95,7 @@ valid_indices = DataLoader(range(len(valid_dataset)), batch_size=config['batch_s
 
 # Load the model 
 processor = DonutProcessor.from_pretrained("/gpfsstore/rech/jqv/ubb84id/huggingface_models/donut/processor")
-model = VisionEncoderDecoderModel.from_pretrained("/gpfsstore/rech/jqv/ubb84id/output_models/encoder_lr1e-06_h2560_w1920")
+model = VisionEncoderDecoderModel.from_pretrained("/gpfsstore/rech/jqv/ubb84id/output_models/decoder_lr1e-06_h2560_w1920")
 
 processor.image_processor.size = config['image_size']
 processor.image_processor.mean = config['mean']
@@ -125,8 +125,8 @@ run = wandb.init(project="Donut",
 
 # training forloop
 model.to(config['device'])
-# train only the encoder
-for p in model.decoder.parameters():
+# train only the decoder
+for p in model.encoder.parameters():
     p.requires_grad = False
   
 opt = AdamW(model.parameters(), lr=config['learning_rate'])
@@ -173,11 +173,11 @@ for epoch in tqdm(range(config['epochs'])):
     valid_loss = valid_loss/len(valid_indices)
     if valid_loss < best_valid_loss:
         best_valid_loss = valid_loss
-        output_folder_name = "encoder_lr{}_h{}_w{}".format(config['learning_rate'], config['image_size'][1], config['image_size'][0])
+        output_folder_name = "decoder_lr{}_h{}_w{}".format(config['learning_rate'], config['image_size'][1], config['image_size'][0])
         model.save_pretrained("/gpfsstore/rech/jqv/ubb84id/output_models/"+output_folder_name)
         with open("/gpfsstore/rech/jqv/ubb84id/output_models/"+output_folder_name+"/info.txt", "w") as f:
-            f.write("checkpoints created at step: {} with train loss : {} and valid loss : {}".format(step, train_loss, best_valid_loss))
-            print("checkpoints created at step: {} with train loss : {} and valid loss : {}".format(step, train_loss, best_valid_loss))
+            f.write("checkpoints created at epoch: {} with train loss : {} and valid loss : {}".format(epoch, train_loss, best_valid_loss))
+            print("checkpoints created at epoch: {} with train loss : {} and valid loss : {}".format(epoch, train_loss, best_valid_loss))
     model.train()
     
 run.finish()
