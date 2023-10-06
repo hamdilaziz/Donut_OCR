@@ -95,7 +95,7 @@ valid_indices = DataLoader(range(len(valid_dataset)), batch_size=config['batch_s
 
 # Load the model 
 processor = DonutProcessor.from_pretrained("/gpfsstore/rech/jqv/ubb84id/huggingface_models/donut/processor")
-model = VisionEncoderDecoderModel.from_pretrained("/gpfsstore/rech/jqv/ubb84id/output_models/model")
+model = VisionEncoderDecoderModel.from_pretrained("/gpfsstore/rech/jqv/ubb84id/huggingface_models/donut/model")
 
 processor.image_processor.size = config['image_size']
 processor.image_processor.mean = config['mean']
