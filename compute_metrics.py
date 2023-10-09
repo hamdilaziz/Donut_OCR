@@ -26,7 +26,7 @@ test_names = list(test_set.keys())
 models_path = "/gpfsstore/rech/jqv/ubb84id/output_models"
 # parameters    
 config = {
-  "model_names": ["encoder_lr1e-06_h2560_w1920" #,"decoder_lr5e-06_h2560_w1920","encoder_lr5e-06_h2560_w1920","decoder_lr1e-06_h2560_w1920",
+  "model_names": ["decoder_lr1e-06_h2560_w1920" #,"encoder_lr5e-06_h2560_w1920","encoder_lr5e-06_h2560_w1920","decoder_lr1e-06_h2560_w1920",
                  ],#os.listdir(models_path),
   "mean":[0.485, 0.456, 0.406],
   "std":[0.229, 0.224, 0.225],
