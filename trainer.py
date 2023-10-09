@@ -47,9 +47,9 @@ config = {
   "image_size":[1920, 2560],
   "max_length":224,
   "batch_size":3,
-  "learning_rate":5e-6,
+  "learning_rate":1e-6,
   "device":'cuda' if torch.cuda.is_available() else 'cpu',
-  "epochs":30
+  "epochs":40
 }
 
 # dataset
@@ -133,51 +133,55 @@ opt = AdamW(model.parameters(), lr=config['learning_rate'])
 model.train()
 step = 0
 best_valid_loss = float('inf')
+train_loss_list = []
 for epoch in tqdm(range(config['epochs'])):
     for batch in tqdm(train_indices):
         # training
         x_train,y_train = train_dataset[batch]
         output = model(**{'pixel_values':x_train, 'labels':y_train})
         train_loss = output.loss
+        train_loss_list.append(train_loss.mean().item())
         train_loss.backward()
         opt.step()
         # log & eval
-        if step % 8 == 0:
-            model.eval()
-            with torch.no_grad():
-                batch = next(iter(valid_indices))
-                x_valid,y_valid = valid_dataset[batch]
-                output = model(**{'pixel_values':x_valid, 'labels':y_valid})
-                valid_loss = output.loss.mean().item()
-                # get pred text
-                preds = output.logits.argmax(-1)[0].detach().cpu()
-                tokens = tokenizer.convert_ids_to_tokens(preds)
-                pred_text = tokenizer.convert_tokens_to_string([t for t in tokens if t not in sepcial_tokens])
-                # gt text
-                y_valid = y_valid[0].detach().cpu()
-                tokens = tokenizer.convert_ids_to_tokens(y_valid)
-                text = tokenizer.convert_tokens_to_string([t for t in tokens if t not in sepcial_tokens])
-                cer = edit_cer_from_string(text, pred_text)/len(text)
-                wer = edit_wer_from_string(text, pred_text)/len(text.split())
-                run.log({"train_loss":train_loss.mean().item(), "valid_loss":valid_loss, "cer":cer, "wer":wer})
-                print("img size {}, Train loss {}, valid loss {}, cer {}, wer {}".format(x_valid.shape, train_loss.mean().item(), valid_loss, cer, wer))
-        step += 1
+        # if step % 8 == 0:
+        #     model.eval()
+        #     with torch.no_grad():
+        #         batch = next(iter(valid_indices))
+        #         x_valid,y_valid = valid_dataset[batch]
+        #         output = model(**{'pixel_values':x_valid, 'labels':y_valid})
+        #         valid_loss = output.loss.mean().item()
+        #         # get pred text
+        #         preds = output.logits.argmax(-1)[0].detach().cpu()
+        #         tokens = tokenizer.convert_ids_to_tokens(preds)
+        #         pred_text = tokenizer.convert_tokens_to_string([t for t in tokens if t not in sepcial_tokens])
+        #         # gt text
+        #         y_valid = y_valid[0].detach().cpu()
+        #         tokens = tokenizer.convert_ids_to_tokens(y_valid)
+        #         text = tokenizer.convert_tokens_to_string([t for t in tokens if t not in sepcial_tokens])
+        #         cer = edit_cer_from_string(text, pred_text)/len(text)
+        #         wer = edit_wer_from_string(text, pred_text)/len(text.split())
+        #         run.log({"train_loss":train_loss.mean().item(), "valid_loss":valid_loss, "cer":cer, "wer":wer})
+        #         print("img size {}, Train loss {}, valid loss {}, cer {}, wer {}".format(x_valid.shape, train_loss.mean().item(), valid_loss, cer, wer))
+        # step += 1
     #### compte loss over valid if valid loss is better save checkpoints
     model.eval()
-    valid_loss = 0
+    valid_loss_list = []
     with torch.no_grad():
         batch = next(iter(valid_indices))
         x_valid,y_valid = valid_dataset[batch]
         output = model(**{'pixel_values':x_valid, 'labels':y_valid})
-        valid_loss += output.loss.mean().item()
-    valid_loss = valid_loss/len(valid_indices)
-    if valid_loss < best_valid_loss:
-        best_valid_loss = valid_loss
+        valid_loss_list.append(output.loss.mean().item())
+    valid_loss_mean = np.mean(valid_loss_list)
+    train_loss_mean = np.mean(train_loss_list)
+    run.log({"epoch":epoch, "train_loss":train_loss_mean,"valid_loss":valid_loss_mean})
+    if valid_loss_mean < best_valid_loss:
+        best_valid_loss = valid_loss_mean
         output_folder_name = "decoder_lr{}_h{}_w{}".format(config['learning_rate'], config['image_size'][1], config['image_size'][0])
         model.save_pretrained("/gpfsstore/rech/jqv/ubb84id/output_models/"+output_folder_name)
         with open("/gpfsstore/rech/jqv/ubb84id/output_models/"+output_folder_name+"/info.txt", "w") as f:
-            f.write("checkpoints created at epoch: {} with train loss : {} and valid loss : {}".format(epoch, train_loss, best_valid_loss))
-            print("checkpoints created at epoch: {} with train loss : {} and valid loss : {}".format(epoch, train_loss, best_valid_loss))
+            f.write("checkpoints created at epoch: {} with train loss : {} and valid loss : {}".format(epoch, train_loss_mean, best_valid_loss))
+            print("checkpoints created at epoch: {} with train loss : {} and valid loss : {}".format(epoch, train_loss_mean, best_valid_loss))
     model.train()
     
 run.finish()
