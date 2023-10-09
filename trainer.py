@@ -147,6 +147,7 @@ for p in model.encoder.parameters():
 opt = AdamW(model.parameters(), lr=config['learning_rate'])
 model.train()
 best_valid_loss = float('inf')
+best_valid_cer = float('inf')
 for epoch in tqdm(range(config['epochs'])):
     train_loss_list = []
     cer_train, wer_train = [],[]
@@ -187,13 +188,24 @@ for epoch in tqdm(range(config['epochs'])):
     # log values to wandb 
     run.log({"epoch":epoch, "train loss":train_loss_mean,"valid loss":valid_loss_mean,"train cer":cer_train_mean,"valid cer":cer_valid_mean, "train wer":wer_train_mean, "valid wer":wer_valid_mean})
     print(f"epoch :{epoch}, train loss:{train_loss_mean}, valid loss:{valid_loss_mean}, train cer:{cer_train_mean}, valid cer:{cer_valid_mean}, train wer:{wer_train_mean}, valid wer:{wer_valid_mean}")
+    
     # save checkpoint if valid loss is better 
     if valid_loss_mean < best_valid_loss:
         best_valid_loss = valid_loss_mean
-        output_folder_name = "decoder_lr{}_h{}_w{}".format(config['learning_rate'], config['image_size'][1], config['image_size'][0])
+        output_folder_name = "decoder_lr{}_h{}_w{}_loss".format(config['learning_rate'], config['image_size'][1], config['image_size'][0])
         model.save_pretrained("/gpfsstore/rech/jqv/ubb84id/output_models/"+output_folder_name)
         with open("/gpfsstore/rech/jqv/ubb84id/output_models/"+output_folder_name+"/info.txt", "w") as f:
             f.write("checkpoints created at epoch: {} with train loss : {} and valid loss : {}".format(epoch, train_loss_mean, best_valid_loss))
             print("checkpoints created at epoch: {} with train loss : {} and valid loss : {}".format(epoch, train_loss_mean, best_valid_loss))
+            
+    # save checkpoint if cer valid is better
+    if cer_valid_mean < best_valid_cer:
+        best_valid_cer = cer_valid_mean
+        output_folder_name = "decoder_lr{}_h{}_w{}_cer".format(config['learning_rate'], config['image_size'][1], config['image_size'][0])
+        model.save_pretrained("/gpfsstore/rech/jqv/ubb84id/output_models/"+output_folder_name)
+        with open("/gpfsstore/rech/jqv/ubb84id/output_models/"+output_folder_name+"/info.txt", "w") as f:
+            f.write("checkpoints created at epoch: {} with train cer : {} and valid cer : {}".format(epoch, cer_train_mean, cer_valid_mean))
+            print("checkpoints created at epoch: {} with train cer : {} and valid cer : {}".format(epoch, cer_train_mean, cer_valid_mean))
+            
     model.train()
 run.finish()
