@@ -23,6 +23,21 @@ def set_seed(seed):
     torch.cuda.manual_seed_all(seed)
 set_seed(42)
 
+def compute_cer_wer_batch(gt_batch, pred_batch):
+    # get pred text
+    # preds_batch = output.logits.argmax(-1).detach().cpu()
+    tokens_batch = [tokenizer.convert_ids_to_tokens(pred) for pred in pred_batch]
+    pred_text_batch = [tokenizer.convert_tokens_to_string([t for t in tokens if t not in sepcial_tokens]) for tokens in tokens_batch]
+    # get gt text
+    # y_valid_batch = y_valid.detach().cpu()
+    tokens_batch = [tokenizer.convert_ids_to_tokens(y) for y in gt_batch]
+    text_batch = [tokenizer.convert_tokens_to_string([t for t in tokens if t not in sepcial_tokens]) for tokens in tokens_batch]
+    cer,wer = [],[]
+    for text,pred_text in zip(text_batch, pred_text_batch):
+        cer.append(edit_cer_from_string(text, pred_text)/len(text))
+        wer.append(edit_wer_from_string(text, pred_text)/len(text.split()))
+    return np.mean(cer), np.mean(wer)
+    
 
 data_root = "/gpfsstore/rech/jqv/ubb84id/data/IAM"
 sub_folder_name = "IAM_page_sem"
@@ -131,10 +146,12 @@ for p in model.encoder.parameters():
   
 opt = AdamW(model.parameters(), lr=config['learning_rate'])
 model.train()
-step = 0
 best_valid_loss = float('inf')
-train_loss_list = []
 for epoch in tqdm(range(config['epochs'])):
+    train_loss_list = []
+    cer_train, wer_train = [],[]
+    valid_loss_list = []
+    # standard training forloop 
     for batch in tqdm(train_indices):
         # training
         x_train,y_train = train_dataset[batch]
@@ -143,38 +160,34 @@ for epoch in tqdm(range(config['epochs'])):
         train_loss_list.append(train_loss.mean().item())
         train_loss.backward()
         opt.step()
-        # log & eval
-        # if step % 8 == 0:
-        #     model.eval()
-        #     with torch.no_grad():
-        #         batch = next(iter(valid_indices))
-        #         x_valid,y_valid = valid_dataset[batch]
-        #         output = model(**{'pixel_values':x_valid, 'labels':y_valid})
-        #         valid_loss = output.loss.mean().item()
-        #         # get pred text
-        #         preds = output.logits.argmax(-1)[0].detach().cpu()
-        #         tokens = tokenizer.convert_ids_to_tokens(preds)
-        #         pred_text = tokenizer.convert_tokens_to_string([t for t in tokens if t not in sepcial_tokens])
-        #         # gt text
-        #         y_valid = y_valid[0].detach().cpu()
-        #         tokens = tokenizer.convert_ids_to_tokens(y_valid)
-        #         text = tokenizer.convert_tokens_to_string([t for t in tokens if t not in sepcial_tokens])
-        #         cer = edit_cer_from_string(text, pred_text)/len(text)
-        #         wer = edit_wer_from_string(text, pred_text)/len(text.split())
-        #         run.log({"train_loss":train_loss.mean().item(), "valid_loss":valid_loss, "cer":cer, "wer":wer})
-        #         print("img size {}, Train loss {}, valid loss {}, cer {}, wer {}".format(x_valid.shape, train_loss.mean().item(), valid_loss, cer, wer))
-        # step += 1
-    #### compte loss over valid if valid loss is better save checkpoints
+        cer,wer = compute_cer_wer_batch(y_train.detach().cpu(),output.logits.argmax(-1).detach().cpu())
+        cer_train.append(cer)
+        wer_train.append(wer)
+    
+    # evaluate the model after each epoch 
     model.eval()
-    valid_loss_list = []
+    cer_valid,wer_valid = [],[]
     with torch.no_grad():
         batch = next(iter(valid_indices))
         x_valid,y_valid = valid_dataset[batch]
         output = model(**{'pixel_values':x_valid, 'labels':y_valid})
         valid_loss_list.append(output.loss.mean().item())
+        cer,wer = compute_cer_wer_batch(y_valid.detach().cpu(),output.logits.argmax(-1).detach().cpu())
+        cer_valid.append(cer)
+        wer_valid.append(wer)
+    
+    # compute loss, cer and wer mean
     valid_loss_mean = np.mean(valid_loss_list)
     train_loss_mean = np.mean(train_loss_list)
-    run.log({"epoch":epoch, "train_loss":train_loss_mean,"valid_loss":valid_loss_mean})
+    cer_train_mean = np.mean(cer_train)
+    wer_train_mean = np.mean(wer_train)
+    cer_valid_mean = np.mean(cer_valid)
+    wer_valid_mean = np.mean(wer_valid)
+    
+    # log values to wandb 
+    run.log({"epoch":epoch, "train loss":train_loss_mean,"valid loss":valid_loss_mean,"train cer":cer_train_mean,"valid cer":cer_valid_mean, "train wer":wer_train_mean, "valid wer":wer_valid_mean})
+    print(f"epoch :{epoch}, train loss:{train_loss_mean}, valid loss:{valid_loss_mean}, train cer:{cer_train_mean}, valid cer:{cer_valid_mean}, train wer:{wer_train_mean}, valid wer:{wer_valid_mean}")
+    # save checkpoint if valid loss is better 
     if valid_loss_mean < best_valid_loss:
         best_valid_loss = valid_loss_mean
         output_folder_name = "decoder_lr{}_h{}_w{}".format(config['learning_rate'], config['image_size'][1], config['image_size'][0])
@@ -183,5 +196,4 @@ for epoch in tqdm(range(config['epochs'])):
             f.write("checkpoints created at epoch: {} with train loss : {} and valid loss : {}".format(epoch, train_loss_mean, best_valid_loss))
             print("checkpoints created at epoch: {} with train loss : {} and valid loss : {}".format(epoch, train_loss_mean, best_valid_loss))
     model.train()
-    
 run.finish()
