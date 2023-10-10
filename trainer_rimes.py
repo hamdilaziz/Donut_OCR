@@ -200,7 +200,7 @@ for epoch in tqdm(range(config['epochs'])):
     if cer_valid_mean < best_valid_cer:
         best_valid_cer = cer_valid_mean
         output_folder_name = "decoder_lr{}_h{}_w{}_cer".format(config['learning_rate'], config['image_size'][1], config['image_size'][0])
-        model.save_pretrained("/gpfsstore/rech/jqv/ubb84id/output_models/RIMES"+output_folder_name)
+        model.save_pretrained("/gpfsstore/rech/jqv/ubb84id/output_models/RIMES/"+output_folder_name)
         with open("/gpfsstore/rech/jqv/ubb84id/output_models/"+output_folder_name+"/info.txt", "w") as f:
             f.write("checkpoints created at epoch: {} with train cer : {} and valid cer : {}".format(epoch, cer_train_mean, cer_valid_mean))
             print("checkpoints created at epoch: {} with train cer : {} and valid cer : {}".format(epoch, cer_train_mean, cer_valid_mean))
