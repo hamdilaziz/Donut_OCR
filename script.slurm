@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=deco_rimes
+#SBATCH --job-name=deco_enco
 ##SBATCH -C v100-32g 
 #SBATCH --ntasks=1                   # number of MP tasks
 #SBATCH --ntasks-per-node=1          # number of MPI tasks per node
@@ -17,4 +17,4 @@ module load cpuarch/amd
 module load pytorch-gpu/py3/1.13.0 
 export PYTHONWARNINGS="ignore" 
  
-python3 trainer_rimes.py
+python3 trainer.py
