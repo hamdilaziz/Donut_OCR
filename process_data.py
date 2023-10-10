@@ -19,8 +19,8 @@ from torch.utils.data import Dataset, DataLoader
 # json_name = "formatted-IAM-DB-subwords-bart.json"
 # imgs_folder = "flat-300dpi"
 
-data_folder_path = "RIMES_page_sem"
-pkl_name = "labels-subwords.pkl"
+data_folder_path = "/gpfsstore/rech/jqv/ubb84id/data/RIMES/RIMES_page_sem"
+pkl_name = "/gpfsstore/rech/jqv/ubb84id/data/RIMES/RIMES_page_sem/labels-subwords.pkl"
 
 # load the data
 with open(os.path.join(data_folder_path, pkl_name), mode='rb') as f:
