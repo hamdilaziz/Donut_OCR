@@ -43,8 +43,8 @@ data_folder_path = "/gpfsstore/rech/jqv/ubb84id/data/RIMES/RIMES_page_sem"
 pkl_name = "/gpfsstore/rech/jqv/ubb84id/data/RIMES/RIMES_page_sem/labels-subwords.pkl"
 
 # load the data
-with open(os.path.join(data_root, sub_folder_name, json_name)) as f:
-    content = json.load(f)
+with open(os.path.join(data_folder_path, pkl_name), mode='rb') as f:
+    content = pickle.load(f)
 charset = content['charset']
 ground_truth = content['ground_truth']
 train_set, valid_set, test_set = ground_truth['train'], ground_truth['valid'], ground_truth['test']
@@ -70,7 +70,7 @@ class IAM_dataset(Dataset):
     def __init__(self, 
                  paths,
                  data_set, 
-                 data_folder_path = "/gpfsstore/rech/jqv/ubb84id/data/RIMES/RIMES_page_sem",
+                 data_folder_path = "/gpfsstore/rech/jqv/ubb84id/data/RIMES/RIMES_page_sem/2560_1920",
                  device='cpu',
                  ext='.pt'):
         
