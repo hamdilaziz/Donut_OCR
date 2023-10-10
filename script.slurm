@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=deco_enco
+#SBATCH --job-name=enco_deco
 ##SBATCH -C v100-32g 
 #SBATCH --ntasks=1                   # number of MP tasks
 #SBATCH --ntasks-per-node=1          # number of MPI tasks per node
