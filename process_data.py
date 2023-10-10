@@ -62,7 +62,7 @@ if os.path.exists(os.path.join(data_folder_path, data_folder_name)) == False:
 # processing     
 for names,dt_set,out_set in zip([train_names, valid_names, test_names], [train_set, valid_set, test_set], ['train','valid','test']):
     for name in names:
-        gt = '/n'.join([e['label'] for e in dt_set[name]['paragraphs']])
+        gt = '\n'.join([e['label'] for e in dt_set[name]['paragraphs']])
         img = plt.imread(os.path.join(data_folder_path,out_set, name))
         img = cv.cvtColor(img, cv.COLOR_GRAY2RGB)
         img = cv.resize(img, tuple(config['image_size']), cv.INTER_AREA)
@@ -75,6 +75,6 @@ for names,dt_set,out_set in zip([train_names, valid_names, test_names], [train_s
                            padding="max_length",
                            truncation=False,
                            return_tensors = 'pt')
-        torch.save(normalized, os.path.join(data_folder_path, data_folder_name, 'train','images', name.split('.')[0]+ext))
+        torch.save(normalized, os.path.join(data_folder_path, data_folder_name, out_set,'images', name.split('.')[0]+ext))
         torch.save(labels['input_ids'], os.path.join(data_folder_path, data_folder_name, out_set,'gt', name.split('.')[0]+ext))
     
