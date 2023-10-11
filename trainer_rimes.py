@@ -138,7 +138,7 @@ run = wandb.init(project=PROJECT_NAME,
 
 # training forloop
 model.to(config['device'])
-# train only the decoder
+# train only the encoder
 for p in model.decoder.parameters():
     p.requires_grad = False
   
