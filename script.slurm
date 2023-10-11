@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=rimes_metrics
+#SBATCH --job-name=metrics
 ##SBATCH -C v100-32g 
 #SBATCH --ntasks=1                   # number of MP tasks
 #SBATCH --ntasks-per-node=1          # number of MPI tasks per node
@@ -17,4 +17,4 @@ module load cpuarch/amd
 module load pytorch-gpu/py3/1.13.0 
 export PYTHONWARNINGS="ignore" 
  
-python3 compute_metrics_rimes.py
+python3 compute_metrics.py
