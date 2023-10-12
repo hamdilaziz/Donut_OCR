@@ -20,7 +20,7 @@ from torch.utils.data import Dataset, DataLoader
 # imgs_folder = "flat-300dpi"
 
 data_folder_path = "/gpfsstore/rech/jqv/ubb84id/data/RIMES_page/"
-pkl_name = "/gpfsstore/rech/jqv/ubb84id/data/RIMES_page/labels-subwords.pkl"
+pkl_name = "/gpfsstore/rech/jqv/ubb84id/data/RIMES_page/labels.pkl"
 
 # load the data
 with open(os.path.join(data_folder_path, pkl_name), mode='rb') as f:
@@ -62,7 +62,8 @@ if os.path.exists(os.path.join(data_folder_path, data_folder_name)) == False:
 # processing     
 for names,dt_set,out_set in zip([train_names, valid_names, test_names], [train_set, valid_set, test_set], ['train','valid','test']):
     for name in names:
-        gt = '\n'.join([e['label'] for e in dt_set[name]['paragraphs']])
+        # gt = '\n'.join([e['label'] for e in dt_set[name]['paragraphs']])
+        gt = dt_set[name]['text']
         img = plt.imread(os.path.join(data_folder_path,out_set, name))
         img = cv.cvtColor(img, cv.COLOR_GRAY2RGB)
         img = cv.resize(img, tuple(config['image_size']), cv.INTER_AREA)
