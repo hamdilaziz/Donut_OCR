@@ -106,6 +106,9 @@ train_indices = DataLoader(range(len(train_dataset)), batch_size=config['batch_s
 valid_dataset = IAM_dataset(valid_names, 'valid', device=config['device'])
 valid_indices = DataLoader(range(len(valid_dataset)), batch_size=config['batch_size'], shuffle=True)
 
+test_dataset = IAM_dataset(test_names, 'test', device=config['device'])
+test_indices = DataLoader(range(len(test_dataset)), batch_size=config['batch_size'], shuffle=True)
+
 # Load the model 
 processor = DonutProcessor.from_pretrained("/gpfsstore/rech/jqv/ubb84id/huggingface_models/donut/processor")
 model = VisionEncoderDecoderModel.from_pretrained("/gpfsstore/rech/jqv/ubb84id/huggingface_models/donut/model")
