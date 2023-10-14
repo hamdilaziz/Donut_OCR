@@ -111,7 +111,7 @@ test_indices = DataLoader(range(len(test_dataset)), batch_size=config['batch_siz
 
 # Load the model 
 processor = DonutProcessor.from_pretrained("/gpfsstore/rech/jqv/ubb84id/huggingface_models/donut/processor")
-model = VisionEncoderDecoderModel.from_pretrained("/gpfsstore/rech/jqv/ubb84id/huggingface_models/donut/model")
+model = VisionEncoderDecoderModel.from_pretrained("/gpfsstore/rech/jqv/ubb84id/output_models/RIMES/encoder_lr1e-05_h2560_w1920_cer")
 
 processor.image_processor.size = config['image_size']
 processor.image_processor.mean = config['mean']
@@ -147,8 +147,8 @@ for p in model.decoder.parameters():
   
 opt = AdamW(model.parameters(), lr=config['learning_rate'])
 model.train()
-best_valid_loss = float('inf')
-best_valid_cer = float('inf')
+best_valid_loss = 8.527804374694824 #float('inf')
+best_valid_cer = 1.365 #float('inf')
 for epoch in tqdm(range(config['epochs'])):
     train_loss_list = []
     cer_train, wer_train = [],[]
