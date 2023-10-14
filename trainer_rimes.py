@@ -54,7 +54,7 @@ test_names = list(test_set.keys())
 
 # parameters
 config = {
-  "part":"encoder",
+  "part":"decoder",
   "mean":[0.485, 0.456, 0.406],
   "std":[0.229, 0.224, 0.225],
   "image_size":[1920, 2560],
@@ -62,7 +62,7 @@ config = {
   "batch_size":3,
   "learning_rate":1e-5,
   "device":'cuda' if torch.cuda.is_available() else 'cpu',
-  "epochs":40
+  "epochs":50
 }
 
 # dataset
@@ -111,7 +111,7 @@ test_indices = DataLoader(range(len(test_dataset)), batch_size=config['batch_siz
 
 # Load the model 
 processor = DonutProcessor.from_pretrained("/gpfsstore/rech/jqv/ubb84id/huggingface_models/donut/processor")
-model = VisionEncoderDecoderModel.from_pretrained("/gpfsstore/rech/jqv/ubb84id/output_models/RIMES/encoder_lr1e-05_h2560_w1920_cer")
+model = VisionEncoderDecoderModel.from_pretrained("/gpfsstore/rech/jqv/ubb84id/output_models/RIMES/encoder_lr1e-05_h2560_w1920")
 
 processor.image_processor.size = config['image_size']
 processor.image_processor.mean = config['mean']
@@ -142,7 +142,7 @@ run = wandb.init(project=PROJECT_NAME,
 # training forloop
 model.to(config['device'])
 # train only the encoder
-for p in model.decoder.parameters():
+for p in model.encoder.parameters():
     p.requires_grad = False
   
 opt = AdamW(model.parameters(), lr=config['learning_rate'])
@@ -207,7 +207,7 @@ for epoch in tqdm(range(config['epochs'])):
     # save checkpoint if valid loss is better 
     if valid_loss_mean < best_valid_loss:
         best_valid_loss = valid_loss_mean
-        output_folder_name = "encoder_lr{}_h{}_w{}".format(config['learning_rate'], config['image_size'][1], config['image_size'][0])
+        output_folder_name = "decoder_lr{}_h{}_w{}".format(config['learning_rate'], config['image_size'][1], config['image_size'][0])
         model.save_pretrained("/gpfsstore/rech/jqv/ubb84id/output_models/RIMES/"+output_folder_name)
         with open("/gpfsstore/rech/jqv/ubb84id/output_models/RIMES/"+output_folder_name+"/info.txt", "w") as f:
             f.write("checkpoints created at epoch: {} with train loss : {} and valid loss : {}".format(epoch, train_loss_mean, best_valid_loss))
@@ -216,7 +216,7 @@ for epoch in tqdm(range(config['epochs'])):
     # save checkpoint if cer valid is better
     if cer_valid_mean < best_valid_cer:
         best_valid_cer = cer_valid_mean
-        output_folder_name = "encoder_lr{}_h{}_w{}_cer".format(config['learning_rate'], config['image_size'][1], config['image_size'][0])
+        output_folder_name = "decoder_lr{}_h{}_w{}_cer".format(config['learning_rate'], config['image_size'][1], config['image_size'][0])
         model.save_pretrained("/gpfsstore/rech/jqv/ubb84id/output_models/RIMES/"+output_folder_name)
         with open("/gpfsstore/rech/jqv/ubb84id/output_models/RIMES/"+output_folder_name+"/info.txt", "w") as f:
             f.write("checkpoints created at epoch: {} with train cer : {} and valid cer : {}".format(epoch, cer_train_mean, cer_valid_mean))
