@@ -56,15 +56,15 @@ test_names = list(test_set.keys())
 
 # parameters
 config = {
-  "part":"encoder_decoder_all",
+  "part":"all",
   "mean":[0.485, 0.456, 0.406],
   "std":[0.229, 0.224, 0.225],
   "image_size":[1920, 2560],
   "max_length":224,
   "batch_size":3,
-  "learning_rate":6e-7,
+  "learning_rate":1e-5,
   "device":'cuda' if torch.cuda.is_available() else 'cpu',
-  "epochs":40
+  "epochs":50
 }
 
 # dataset
@@ -110,7 +110,7 @@ valid_indices = DataLoader(range(len(valid_dataset)), batch_size=config['batch_s
 
 # Load the model 
 processor = DonutProcessor.from_pretrained("/gpfsstore/rech/jqv/ubb84id/huggingface_models/donut/processor")
-model = VisionEncoderDecoderModel.from_pretrained("/gpfsstore/rech/jqv/ubb84id/output_models/encoder_decoder_lr1e-06_h2560_w1920")
+model = VisionEncoderDecoderModel.from_pretrained("/gpfsstore/rech/jqv/ubb84id/huggingface_models/donut/model")
 
 processor.image_processor.size = config['image_size']
 processor.image_processor.mean = config['mean']
@@ -176,7 +176,16 @@ for epoch in tqdm(range(config['epochs'])):
         cer,wer = compute_cer_wer_batch(y_valid.detach().cpu(),output.logits.argmax(-1).detach().cpu())
         cer_valid.append(cer)
         wer_valid.append(wer)
-    
+
+    # compute cer on test set
+    cer_test = []
+    with torch.no_grad():
+        batch = next(iter(test_indices))
+        x_test,y_test = test_dataset[batch]
+        output = model(**{'pixel_values':x_test, 'labels':y_test})
+        cer,_ = compute_cer_wer_batch(y_test.detach().cpu(),output.logits.argmax(-1).detach().cpu())
+        cer_test.append(cer)
+        
     # compute loss, cer and wer mean
     valid_loss_mean = np.mean(valid_loss_list)
     train_loss_mean = np.mean(train_loss_list)
@@ -184,28 +193,33 @@ for epoch in tqdm(range(config['epochs'])):
     wer_train_mean = np.mean(wer_train)
     cer_valid_mean = np.mean(cer_valid)
     wer_valid_mean = np.mean(wer_valid)
+    cer_test_mean = np.mean(cer_test)
     
     # log values to wandb 
-    run.log({"epoch":epoch, "train loss":train_loss_mean,"valid loss":valid_loss_mean,"train cer":cer_train_mean,"valid cer":cer_valid_mean, "train wer":wer_train_mean, "valid wer":wer_valid_mean})
-    print(f"epoch :{epoch}, train loss:{train_loss_mean}, valid loss:{valid_loss_mean}, train cer:{cer_train_mean}, valid cer:{cer_valid_mean}, train wer:{wer_train_mean}, valid wer:{wer_valid_mean}")
+    run.log({"epoch":epoch, "train loss":train_loss_mean,"valid loss":valid_loss_mean,
+             "train cer":cer_train_mean,"valid cer":cer_valid_mean,"test cer":cer_test_mean, 
+             "train wer":wer_train_mean, "valid wer":wer_valid_mean})
+    
+    print(f"epoch :{epoch}, train loss:{train_loss_mean}, valid loss:{valid_loss_mean}, train cer:{cer_train_mean}, \
+            valid cer:{cer_valid_mean}, train wer:{wer_train_mean}, valid wer:{wer_valid_mean}, test cer:{cer_test_mean}")
     
     # save checkpoint if valid loss is better 
     if valid_loss_mean < best_valid_loss:
         best_valid_loss = valid_loss_mean
-        output_folder_name = "decoder_encoder_lr{}_h{}_w{}".format(config['learning_rate'], config['image_size'][1], config['image_size'][0])
+        output_folder_name = "all_lr{}_h{}_w{}".format(config['learning_rate'], config['image_size'][1], config['image_size'][0])
         model.save_pretrained("/gpfsstore/rech/jqv/ubb84id/output_models/"+output_folder_name)
         with open("/gpfsstore/rech/jqv/ubb84id/output_models/"+output_folder_name+"/info.txt", "w") as f:
             f.write("checkpoints created at epoch: {} with train loss : {} and valid loss : {}".format(epoch, train_loss_mean, best_valid_loss))
             print("checkpoints created at epoch: {} with train loss : {} and valid loss : {}".format(epoch, train_loss_mean, best_valid_loss))
             
     # save checkpoint if cer valid is better
-    # if cer_valid_mean < best_valid_cer:
-    #     best_valid_cer = cer_valid_mean
-    #     output_folder_name = "encoder_decoder_all_lr{}_h{}_w{}_cer".format(config['learning_rate'], config['image_size'][1], config['image_size'][0])
-    #     model.save_pretrained("/gpfsstore/rech/jqv/ubb84id/output_models/"+output_folder_name)
-    #     with open("/gpfsstore/rech/jqv/ubb84id/output_models/"+output_folder_name+"/info.txt", "w") as f:
-    #         f.write("checkpoints created at epoch: {} with train cer : {} and valid cer : {}".format(epoch, cer_train_mean, cer_valid_mean))
-    #         print("checkpoints created at epoch: {} with train cer : {} and valid cer : {}".format(epoch, cer_train_mean, cer_valid_mean))
+    if cer_valid_mean < best_valid_cer:
+        best_valid_cer = cer_valid_mean
+        output_folder_name = "all_lr{}_h{}_w{}_cer".format(config['learning_rate'], config['image_size'][1], config['image_size'][0])
+        model.save_pretrained("/gpfsstore/rech/jqv/ubb84id/output_models/"+output_folder_name)
+        with open("/gpfsstore/rech/jqv/ubb84id/output_models/"+output_folder_name+"/info.txt", "w") as f:
+            f.write("checkpoints created at epoch: {} with train cer : {} and valid cer : {}".format(epoch, cer_train_mean, cer_valid_mean))
+            print("checkpoints created at epoch: {} with train cer : {} and valid cer : {}".format(epoch, cer_train_mean, cer_valid_mean))
             
     model.train()
 run.finish()
