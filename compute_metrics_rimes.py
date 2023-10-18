@@ -39,7 +39,7 @@ class IAM_dataset(Dataset):
     def __init__(self, 
                  paths,
                  data_set, 
-                 data_folder_path = "/gpfsstore/rech/jqv/ubb84id/data/RIMES/RIMES_page_sem/2560_1920",
+                 data_folder_path = "/gpfsstore/rech/jqv/ubb84id/data/RIMES_page/2560_1920",
                  device='cpu',
                  ext='.pt'):
         
