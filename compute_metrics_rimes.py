@@ -9,8 +9,8 @@ import cv2 as cv
 import pickle
 from metrics import edit_cer_from_string, edit_wer_from_string
 
-data_folder_path = "/gpfsstore/rech/jqv/ubb84id/data/RIMES/RIMES_page_sem"
-pkl_name = "/gpfsstore/rech/jqv/ubb84id/data/RIMES/RIMES_page_sem/labels-subwords.pkl"
+data_folder_path = "/gpfsstore/rech/jqv/ubb84id/data/RIMES_page/"
+pkl_name = "/gpfsstore/rech/jqv/ubb84id/data/RIMES_page/labels.pkl"
 
 # load the data
 with open(os.path.join(data_folder_path, pkl_name), mode='rb') as f:
