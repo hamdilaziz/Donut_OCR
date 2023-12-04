@@ -133,10 +133,10 @@ model.config.decoder_start_token_id = tokenizer.convert_tokens_to_ids(['<s>'])[0
 
 
 # wandb
-KEY = "001b0cc1cdeb60216984dcc127298026eb6a9e8e"
+with open("/gpfswork/rech/jqv/ubb84id/key.txt", mode='r') as f:
+    wandb.login(key = f.read())
 PROJECT_NAME = "Donut_OCR"
 os.environ["WANDB_MODE"]="offline"
-wandb.login(key = KEY)
 run = wandb.init(project="Donut",
                  entity="lazizhamdi",
                  config=config)
